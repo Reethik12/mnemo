@@ -1,10 +1,12 @@
 /**
  * Service layer for the Mnemo application.
  *
- * Place API service functions, external integrations, and
- * data-fetching logic here.
- *
- * Export all services from this barrel file:
- * export { userService } from "./user-service";
- * export { aiService } from "./ai-service";
+ * All services use mock data and are designed as clean abstractions
+ * that can be swapped for real API calls without changing UI code.
  */
+
+export { authService } from "./auth-service";
+export { userService } from "./user-service";
+export { notificationService } from "./notification-service";
+export { sessionService } from "./session-service";
+export { memoryService } from "./memory-service";

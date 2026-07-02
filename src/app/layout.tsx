@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
+import { AppProvider } from "@/providers/app-provider";
 import "./globals.css";
 
 // ─── Fonts ───────────────────────────────────────────
@@ -70,15 +69,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable}`}
-      suppressHydrationWarning
-    >
-      <body className="bg-bg-primary text-text-primary antialiased">
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+    <html lang="en" className="dark">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} bg-bg-primary text-text-primary selection:bg-accent-purple/30 antialiased`}
+      >
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );

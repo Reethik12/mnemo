@@ -134,3 +134,106 @@ export const hoverLift = {
   whileHover: { y: -4 },
   transition: transitions.smooth,
 } as const;
+
+// ─── Phase 2: Workspace Variants ─────────────────────
+
+export const pageTransition: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: transitions.smooth,
+  },
+  exit: {
+    opacity: 0,
+    y: -8,
+    transition: { duration: 0.2 },
+  },
+};
+
+export const cardAppear: Variants = {
+  hidden: { opacity: 0, y: 20, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: transitions.smooth,
+  },
+};
+
+export const dropdownReveal: Variants = {
+  hidden: { opacity: 0, scale: 0.95, y: -5 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "tween", duration: 0.15 },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.95,
+    y: -5,
+    transition: { type: "tween", duration: 0.1 },
+  },
+};
+
+export const sidebarExpand: Variants = {
+  collapsed: { width: "var(--sidebar-width-collapsed)" },
+  expanded: {
+    width: "var(--sidebar-width-expanded)",
+    transition: { type: "tween", duration: 0.3, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+// ─── Phase 3: Memory Workspace Variants ──────────────
+
+export const memoryOpen: Variants = {
+  hidden: { opacity: 0, scale: 0.98, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: transitions.smooth,
+  },
+};
+
+export const memoryClose: Variants = {
+  visible: { opacity: 1, scale: 1 },
+  hidden: {
+    opacity: 0,
+    scale: 0.95,
+    transition: transitions.snappy,
+  },
+};
+
+export const memorySelect: Variants = {
+  idle: { scale: 1, backgroundColor: "transparent" },
+  selected: {
+    scale: 1,
+    backgroundColor: "rgba(109, 91, 255, 0.1)", // accent-purple / 10
+    transition: transitions.snappy,
+  },
+};
+
+export const panelSlide: Variants = {
+  hidden: { opacity: 0, x: 20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: transitions.smooth,
+  },
+  exit: {
+    opacity: 0,
+    x: 20,
+    transition: transitions.snappy,
+  },
+};
+
+export const editorFade: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: transitions.smooth,
+  },
+};

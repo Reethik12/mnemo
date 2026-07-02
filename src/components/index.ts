@@ -1,46 +1,69 @@
-// ─── UI Components ───────────────────────────────────
+/**
+ * Shared UI Components
+ * Exporting all UI components for easy imports across the application.
+ */
+
+// Phase 1 Components (Base)
 export { Button } from "./ui/button";
-export type { ButtonProps, ButtonVariant, ButtonSize } from "./ui/button";
-
-export { Input } from "./ui/input";
-export type { InputProps } from "./ui/input";
-
 export { Card } from "./ui/card";
-export type { CardProps, CardVariant } from "./ui/card";
-
-export { Tooltip } from "./ui/tooltip";
-export type { TooltipProps } from "./ui/tooltip";
-
-export { Skeleton } from "./ui/skeleton";
-export type { SkeletonProps } from "./ui/skeleton";
-
+export { Input } from "./ui/input";
 export { Modal } from "./ui/modal";
-export type { ModalProps } from "./ui/modal";
-
 export { Dropdown } from "./ui/dropdown";
-export type { DropdownProps, DropdownItem } from "./ui/dropdown";
-
+export { Tooltip } from "./ui/tooltip";
+export { Skeleton } from "./ui/skeleton";
 export { LoadingIndicator } from "./ui/loading-indicator";
-export type { LoadingIndicatorProps } from "./ui/loading-indicator";
 
-// ─── Layout Components ──────────────────────────────
-export { Navbar } from "./layout/navbar";
-export { MobileMenu } from "./layout/mobile-menu";
-export { Footer } from "./layout/footer";
-export { PageContainer } from "./layout/page-container";
+// Phase 2 Components (Auth)
+export { AuthCard } from "./auth/auth-card";
+export { SocialLoginButtons } from "./auth/social-login-buttons";
+export { AuthDivider } from "./auth/auth-divider";
+export { PasswordInput } from "./auth/password-input";
+export { PasswordStrength } from "./auth/password-strength";
+export { VerificationCodeInput } from "./auth/verification-code-input";
 
-// ─── Landing Sections ───────────────────────────────
-export { Hero } from "./landing/hero";
-export { FeaturesPreview } from "./landing/features-preview";
-export { ModulesPreview } from "./landing/modules-preview";
-export { VisionSection } from "./landing/vision-section";
-export { ArchitecturePreview } from "./landing/architecture-preview";
-export { CTASection } from "./landing/cta-section";
+// Phase 2 Components (Workspace)
+export { Sidebar } from "./workspace/sidebar";
+export { SidebarItem } from "./workspace/sidebar-item";
+export { SidebarSection } from "./workspace/sidebar-section";
+export { TopNav } from "./workspace/top-nav";
+export { WorkspaceShell } from "./workspace/workspace-shell";
+export { WorkspaceSwitcher } from "./workspace/workspace-switcher";
+export { CommandCenter } from "./workspace/command-center";
+export { QuickLaunch } from "./workspace/quick-launch";
 
-// ─── Effects ─────────────────────────────────────────
-export { AnimatedGrid } from "./effects/animated-grid";
-export { Aurora } from "./effects/aurora";
-export { NoiseTexture } from "./effects/noise-texture";
-export { Particles } from "./effects/particles";
-export { GlowOrbs } from "./effects/glow-orbs";
-export { GradientMesh } from "./effects/gradient-mesh";
+// Phase 2 Components (Dashboard)
+export { WelcomeBanner } from "./dashboard/welcome-banner";
+export { StatsCard } from "./dashboard/stats-card";
+export { ModuleCard } from "./dashboard/module-card";
+export { QuickActionCard } from "./dashboard/quick-action-card";
+export { RecentActivity } from "./dashboard/recent-activity";
+
+// Phase 2 Components (Shared)
+export { ProtectedRoute } from "./shared/protected-route";
+export { EmptyState } from "./shared/empty-state";
+export { ComingSoonBadge } from "./shared/coming-soon-badge";
+export { SectionHeader } from "./shared/section-header";
+export { GlassContainer } from "./shared/glass-container";
+export { StatusPill } from "./shared/status-pill";
+export { ContextMenu } from "./shared/context-menu";
+export { LoadingOverlay } from "./shared/loading-overlay";
+export { OfflineBanner } from "./shared/offline-banner";
+export { ErrorScreen } from "./shared/error-screen";
+
+// Phase 3 Components (Memory Workspace)
+export { MemoryList } from "./memory/memory-list";
+export { MemoryItem } from "./memory/memory-item";
+export { MemoryToolbar } from "./memory/memory-toolbar";
+export { MemoryEditor } from "./memory/memory-editor";
+export { MemoryInspector } from "./memory/memory-inspector";
+export { MemoryEmptyState } from "./memory/memory-empty-state";
+export { MemoryLoading } from "./memory/memory-loading";
+export { MemoryFilterDropdown } from "./memory/memory-filter";
+export { MemorySortDropdown } from "./memory/memory-sort";
+export { MemoryActions } from "./memory/memory-actions";
+export { MemoryDeleteDialog } from "./memory/memory-delete-dialog";
+export { BulkActionsBar } from "./memory/bulk-actions-bar";
+export * from "./memory/view-switcher";
+export { EditorTabs } from "./memory/editor-tabs";
+export { EditorHeader } from "./memory/editor-header";
+export { EditorStatusBar } from "./memory/editor-status-bar";

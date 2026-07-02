@@ -77,6 +77,20 @@
   --animate-shimmer: shimmer 2s ease-in-out infinite;
   --animate-particle-float: particle-float 20s linear infinite;
   --animate-spin-slow: spin-slow 12s linear infinite;
+
+  /* --- Workspace Layout (Phase 2) --- */
+  --sidebar-width-expanded: 260px;
+  --sidebar-width-collapsed: 72px;
+  --topnav-height: 64px;
+
+  /* --- Status Colors (Phase 2) --- */
+  --color-status-success: #10b981;
+  --color-status-warning: #f59e0b;
+  --color-status-error: #ef4444;
+  --color-status-info: #3b82f6;
+
+  /* --- Workspace Animations (Phase 2) --- */
+  --animate-slide-in-right: slide-in-right 0.3s var(--ease-out);
 }
 
 /* ============================================
@@ -173,6 +187,17 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
