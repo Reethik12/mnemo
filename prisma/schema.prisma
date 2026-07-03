@@ -1,0 +1,364 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [vector]
+}
+
+model User {
+  id            String            @id @default(uuid())
+  name          String?
+  email         String            @unique
+  emailVerified Boolean?
+  image         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  deletedAt     DateTime?
+  sessions      Session[]
+  accounts      Account[]
+  workspaces    Workspace[]
+  settings      Settings?
+  notifications Notification[]
+  memberships   WorkspaceMember[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+}
+
+model Account {
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Verification {
+  id         String   @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Workspace {
+  id            String                @id @default(uuid())
+  name          String
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  deletedAt     DateTime?
+  userId        String
+  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  memories      Memory[]
+  conversations Conversation[]
+  prompts       Prompt[]
+  members       WorkspaceMember[]
+  invitations   WorkspaceInvitation[]
+  auditLogs     AuditLog[]
+  agents        Agent[]
+  workflows     Workflow[]
+  decisions     DecisionLog[]
+  schedules     AgentSchedule[]
+  apikeys       APIKey[]
+
+  @@index([userId])
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+model WorkspaceMember {
+  id          String        @id @default(uuid())
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        WorkspaceRole @default(VIEWER)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@unique([workspaceId, userId])
+}
+
+model WorkspaceInvitation {
+  id          String        @id @default(uuid())
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  email       String
+  role        WorkspaceRole @default(VIEWER)
+  token       String        @unique
+  expiresAt   DateTime
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model AuditLog {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String?
+  action      String
+  resource    String
+  resourceId  String?
+  metadata    Json?
+  timestamp   DateTime  @default(now())
+}
+
+model Memory {
+  id          String        @id @default(uuid())
+  title       String
+  content     String
+  tags        String[]
+  metadata    Json?
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
+  chunks      MemoryChunk[]
+
+  @@index([workspaceId])
+}
+
+model MemoryChunk {
+  id        String                       @id @default(uuid())
+  memoryId  String
+  memory    Memory                       @relation(fields: [memoryId], references: [id], onDelete: Cascade)
+  content   String
+  embedding Unsupported("vector(1536)")?
+  metadata  Json?
+  createdAt DateTime                     @default(now())
+
+  @@index([memoryId])
+}
+
+model Conversation {
+  id          String    @id @default(uuid())
+  title       String
+  messages    Json
+  modelId     String?
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([workspaceId])
+}
+
+model Prompt {
+  id          String    @id @default(uuid())
+  title       String
+  content     String
+  variables   String[]
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([workspaceId])
+}
+
+model Provider {
+  id           String    @id @default(uuid())
+  name         String
+  apiKey       String?
+  baseUrl      String?
+  capabilities Json?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  isRead    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([userId])
+}
+
+model Settings {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme     String   @default("system")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Agentic OS Models ───────────────────────────────
+
+model Agent {
+  id            String          @id @default(uuid())
+  name          String
+  type          String // PERSONAL, WORKSPACE, ASSISTANT, BACKGROUND, SYSTEM
+  identity      String
+  description   String
+  goals         String[]
+  instructions  String[]
+  status        String // IDLE, THINKING, PLANNING, RUNNING, WAITING, COMPLETED, FAILED
+  capabilities  String[]
+  memoryScope   String          @default("workspace")
+  workspaceId   String
+  workspace     Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  modelId       String?
+  providerId    String?
+  tokenBudget   Int             @default(500000)
+  maxIterations Int             @default(30)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  goalsList     Goal[]
+  decisions     DecisionLog[]
+  schedules     AgentSchedule[]
+
+  @@index([workspaceId])
+}
+
+model Goal {
+  id          String      @id @default(uuid())
+  agentId     String
+  agent       Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  priority    String      @default("MEDIUM") // LOW, MEDIUM, HIGH
+  status      String      @default("PENDING") // PENDING, RUNNING, COMPLETED, FAILED
+  progress    Float       @default(0.0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  tasks       AgentTask[]
+}
+
+model AgentTask {
+  id            String      @id @default(uuid())
+  goalId        String
+  goal          Goal        @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  title         String
+  description   String
+  status        String      @default("PENDING") // PENDING, READY, RUNNING, WAITING, COMPLETED, CANCELLED, FAILED
+  parentTaskId  String?
+  parentTask    AgentTask?  @relation("TaskHierarchy", fields: [parentTaskId], references: [id], onDelete: Cascade)
+  childTasks    AgentTask[] @relation("TaskHierarchy")
+  dependencies  String[] // Array of prerequisite task UUID strings
+  retryCount    Int         @default(0)
+  executionTime Int?
+  errorLogs     String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Workflow {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name        String
+  status      String    @default("IDLE") // IDLE, RUNNING, COMPLETED, FAILED
+  version     Int       @default(1)
+  steps       Json
+  checkpoint  Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([workspaceId])
+}
+
+model DecisionLog {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  agentId     String
+  agent       Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  action      String
+  confidence  Float
+  riskScore   Float
+  status      String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, APPROVED, REJECTED, BYPASSED
+  policy      String    @default("ALWAYS_ASK") // ALWAYS_ASK, HIGH_RISK_ONLY, AUTO_APPROVE
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([workspaceId])
+  @@index([agentId])
+}
+
+model AgentSchedule {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  agentId     String
+  agent       Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  cron        String
+  taskType    String
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([workspaceId])
+  @@index([agentId])
+}
+
+model APIKey {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name        String
+  key         String    @unique
+  scope       String    @default("READ_ONLY") // READ_ONLY, FULL_ACCESS
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([workspaceId])
+}
+
+model Plugin {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  version     String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Organization {
+  id          String   @id @default(uuid())
+  name        String
+  billingPlan String   @default("FREE") // FREE, PRO, ENTERPRISE
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

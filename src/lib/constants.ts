@@ -248,8 +248,56 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
         href: "/dashboard",
         iconKey: "home",
       },
+      {
+        id: "agents",
+        label: "AI Agents",
+        href: "/agents",
+        iconKey: "brain",
+      },
+      {
+        id: "planner",
+        label: "Planner",
+        href: "/planner",
+        iconKey: "clock",
+      },
+      {
+        id: "workflows",
+        label: "Workflows",
+        href: "/workflows",
+        iconKey: "network",
+      },
+      {
+        id: "autonomous",
+        label: "Autonomous",
+        href: "/autonomous",
+        iconKey: "settings",
+      },
     ],
   },
+  {
+    title: "Ecosystem & Platform",
+    items: [
+      {
+        id: "developer",
+        label: "Developer APIs",
+        href: "/developer",
+        iconKey: "settings",
+      },
+      {
+        id: "plugins",
+        label: "Plugins Registry",
+        href: "/plugins",
+        iconKey: "settings",
+      },
+      {
+        id: "admin",
+        label: "Platform Admin",
+        href: "/admin",
+        iconKey: "settings",
+      },
+    ],
+  },
+
   {
     title: "Modules",
     items: [

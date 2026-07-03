@@ -379,8 +379,9 @@ export function AIProviderComponent({
 
       try {
         await AIService.streamMessage(
-          content,
-          (chunk) => {
+          state.activeConversation.id,
+          [{ role: "user", content }],
+          (chunk: string) => {
             dispatch({
               type: "SET_STREAMING_STATE",
               payload: { currentText: chunk }, // In a real app we accumulate in state or component
@@ -413,6 +414,8 @@ export function AIProviderComponent({
               payload: { status: "completed" },
             });
           },
+          undefined,
+          undefined,
           abortControllerRef.current.signal,
         );
       } catch (err: unknown) {

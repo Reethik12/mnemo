@@ -1,84 +1,120 @@
-import { Memory } from "@/types";
-import { MOCK_MEMORIES } from "@/lib/constants";
+import { apiClient } from "@/lib/api-client";
+import { Memory } from "@/types/memory";
 
-class MemoryService {
-  private memories: Memory[] = [...MOCK_MEMORIES];
+const WORKSPACE_ID = "00000000-0000-0000-0000-000000000000";
 
-  // Helper to simulate network delay
-  private async delay(ms: number = 500) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
+function toFrontendMemory(backendMemory: unknown): Memory {
+  const m = backendMemory as {
+    id: string;
+    title: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    tags: string[];
+    metadata: {
+      isFavorite?: boolean;
+      isPinned?: boolean;
+      isArchived?: boolean;
+      category?: string;
+    } | null;
+  };
+  return {
+    id: m.id,
+    title: m.title,
+    content: m.content,
+    createdAt: m.createdAt,
+    updatedAt: m.updatedAt,
+    category: (m.metadata?.category as Memory["category"]) || "Uncategorized",
+    tags: m.tags || [],
+    pinned: !!m.metadata?.isPinned,
+    favorite: !!m.metadata?.isFavorite,
+    archived: !!m.metadata?.isArchived,
+  };
+}
 
-  async getMemories(): Promise<Memory[]> {
-    await this.delay();
-    // Return all memories including archived, the filtering will happen in the hooks
-    return [...this.memories];
-  }
+export const memoryService = {
+  async getMemories(page = 1, limit = 50): Promise<Memory[]> {
+    const data = await apiClient.get<unknown[]>(
+      `/api/memories?workspaceId=${WORKSPACE_ID}&page=${page}&limit=${limit}`,
+    );
+    return data.map(toFrontendMemory);
+  },
+
+  async getMemory(id: string): Promise<Memory> {
+    const data = await apiClient.get<unknown>(`/api/memories/${id}`);
+    return toFrontendMemory(data);
+  },
 
   async createMemory(
-    memory: Omit<Memory, "id" | "createdAt" | "updatedAt">,
+    data: Omit<Memory, "id" | "createdAt" | "updatedAt">,
   ): Promise<Memory> {
-    await this.delay();
-    const newMemory: Memory = {
-      ...memory,
-      id: `mem-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    const payload = {
+      title: data.title,
+      content: data.content,
+      tags: data.tags,
+      metadata: {
+        category: data.category,
+        isPinned: data.pinned,
+        isFavorite: data.favorite,
+        isArchived: data.archived,
+      },
+      workspaceId: WORKSPACE_ID,
     };
-    this.memories = [newMemory, ...this.memories];
-    return newMemory;
-  }
+    const res = await apiClient.post<unknown>("/api/memories", payload);
+    return toFrontendMemory(res);
+  },
 
   async updateMemory(id: string, updates: Partial<Memory>): Promise<Memory> {
-    await this.delay();
-    const index = this.memories.findIndex((m) => m.id === id);
-    if (index === -1) throw new Error("Memory not found");
-
-    const updatedMemory = {
-      ...this.memories[index],
-      ...updates,
-      updatedAt: new Date().toISOString(),
+    const payload = {
+      title: updates.title,
+      content: updates.content,
+      tags: updates.tags,
+      metadata: {
+        category: updates.category,
+        isPinned: updates.pinned,
+        isFavorite: updates.favorite,
+        isArchived: updates.archived,
+      },
     };
-    this.memories[index] = updatedMemory;
-    return updatedMemory;
-  }
+    const res = await apiClient.patch<unknown>(`/api/memories/${id}`, payload);
+    return toFrontendMemory(res);
+  },
 
   async deleteMemory(id: string): Promise<void> {
-    await this.delay();
-    this.memories = this.memories.filter((m) => m.id !== id);
-  }
+    return apiClient.delete<void>(`/api/memories/${id}`);
+  },
 
   async duplicateMemory(id: string): Promise<Memory> {
-    await this.delay();
-    const existing = this.memories.find((m) => m.id === id);
-    if (!existing) throw new Error("Memory not found");
+    const original = await this.getMemory(id);
+    return this.createMemory({
+      ...original,
+      title: `${original.title} (Copy)`,
+    });
+  },
 
-    const duplicate: Memory = {
-      ...existing,
-      id: `mem-${Date.now()}`,
-      title: `${existing.title} (Copy)`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    this.memories = [duplicate, ...this.memories];
-    return duplicate;
-  }
+  async favoriteMemory(id: string, currentState: boolean): Promise<Memory> {
+    return this.updateMemory(id, { favorite: !currentState });
+  },
 
-  async favoriteMemory(id: string, favorite: boolean): Promise<Memory> {
-    return this.updateMemory(id, { favorite });
-  }
-
-  async pinMemory(id: string, pinned: boolean): Promise<Memory> {
-    return this.updateMemory(id, { pinned });
-  }
+  async pinMemory(id: string, currentState: boolean): Promise<Memory> {
+    return this.updateMemory(id, { pinned: !currentState });
+  },
 
   async archiveMemory(id: string): Promise<Memory> {
-    return this.updateMemory(id, { archived: true, pinned: false });
-  }
+    return this.updateMemory(id, { archived: true });
+  },
 
   async restoreMemory(id: string): Promise<Memory> {
     return this.updateMemory(id, { archived: false });
-  }
-}
+  },
 
-export const memoryService = new MemoryService();
+  async searchMemories(query: string): Promise<Memory[]> {
+    const all = await this.getMemories();
+    const lower = query.toLowerCase();
+    return all.filter(
+      (m) =>
+        m.title.toLowerCase().includes(lower) ||
+        m.content.toLowerCase().includes(lower),
+    );
+  },
+};

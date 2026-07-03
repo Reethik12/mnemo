@@ -11,6 +11,7 @@ import {
 import { Memory } from "@/types";
 import { memoryService } from "@/services";
 import { useToast } from "@/hooks/use-toast";
+import { useRealtime } from "@/providers/realtime-provider";
 
 interface MemoryContextType {
   memories: Memory[];
@@ -55,9 +56,30 @@ export function MemoryProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const { subscribe } = useRealtime();
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    refreshMemories();
+    const unsubCreated = subscribe("MemoryCreated", () => {
+      refreshMemories();
+    });
+    const unsubUpdated = subscribe("MemoryUpdated", () => {
+      refreshMemories();
+    });
+    const unsubDeleted = subscribe("MemoryDeleted", () => {
+      refreshMemories();
+    });
+
+    return () => {
+      unsubCreated();
+      unsubUpdated();
+      unsubDeleted();
+    };
+  }, [subscribe, refreshMemories]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      refreshMemories();
+    }, 0);
   }, [refreshMemories]);
 
   const createMemory = useCallback(

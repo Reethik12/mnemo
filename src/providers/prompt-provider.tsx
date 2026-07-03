@@ -190,8 +190,12 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
           PromptEngineService.loadTemplates(),
           PromptEngineService.loadCategories(),
           PromptEngineService.loadHistory(),
-          PromptEngineService.loadContextMemories(),
-          PromptEngineService.loadSuggestions(),
+          PromptEngineService.loadContextMemories() as unknown as Promise<
+            unknown[]
+          >,
+          PromptEngineService.loadSuggestions() as unknown as Promise<
+            unknown[]
+          >,
           PromptEngineService.loadStatistics(),
         ]);
 
@@ -201,10 +205,14 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
             templates,
             categories,
             history,
-            contextMemories,
-            suggestions,
+            contextMemories:
+              contextMemories as unknown as import("@/types/prompt").ContextMemory[],
+            suggestions: suggestions as unknown as string[],
             statistics,
-          },
+          } as unknown as Extract<
+            PromptAction,
+            { type: "SET_INITIAL_DATA" }
+          >["payload"],
         });
       } catch (err) {
         console.error(err);
@@ -225,7 +233,10 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
       state.activeVariables,
       state.selectedContextIds,
     );
-    dispatch({ type: "SET_COMPILED_CONTENT", payload: compiled });
+    dispatch({
+      type: "SET_COMPILED_CONTENT",
+      payload: compiled as unknown as string,
+    });
   }, [state.rawContent, state.activeVariables, state.selectedContextIds]);
 
   const refreshEstimates = useCallback(async () => {
@@ -234,7 +245,10 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
       state.rawContent,
       state.selectedContextIds,
     );
-    dispatch({ type: "SET_TOKEN_ESTIMATE", payload: estimate });
+    dispatch({
+      type: "SET_TOKEN_ESTIMATE",
+      payload: estimate as unknown as import("@/types/prompt").TokenEstimate,
+    });
   }, [state.rawContent, state.selectedContextIds]);
 
   useEffect(() => {

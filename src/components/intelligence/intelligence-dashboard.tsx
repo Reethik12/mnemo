@@ -5,6 +5,7 @@ import { IntelligenceInsightCard } from "./intelligence-insight-card";
 import { useIntelligence } from "@/hooks/use-intelligence";
 import { SectionHeader } from "@/components/shared/section-header";
 import { memo } from "react";
+import { MetricsDashboard } from "@/components/monitoring/metrics-dashboard";
 
 export const IntelligenceDashboard = memo(function IntelligenceDashboard() {
   const { clusters, insights } = useIntelligence();
@@ -36,6 +37,17 @@ export const IntelligenceDashboard = memo(function IntelligenceDashboard() {
           {clusters.map((cluster) => (
             <SemanticClusterCard key={cluster.id} cluster={cluster} />
           ))}
+        </div>
+      </section>
+
+      {/* Production Infrastructure Monitor */}
+      <section>
+        <SectionHeader
+          title="Production Intelligence Monitoring"
+          description="Vector stats, retrieval latency, and structured health telemetry"
+        />
+        <div className="mt-4">
+          <MetricsDashboard />
         </div>
       </section>
     </div>

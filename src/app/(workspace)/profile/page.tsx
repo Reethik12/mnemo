@@ -24,7 +24,7 @@ export default function ProfilePage() {
 
     setIsLoading(true);
     try {
-      await userService.updateProfile(user, { name, email });
+      await userService.updateProfile(user.id, { name, email });
       setIsEditing(false);
     } finally {
       setIsLoading(false);

@@ -5,7 +5,8 @@ import { Dropdown } from "@/components/ui/dropdown";
 import { cn } from "@/lib/cn";
 
 export function WorkspaceSwitcher({ isExpanded }: { isExpanded: boolean }) {
-  const { workspaces, activeWorkspace, switchWorkspace } = useWorkspace();
+  const { workspaces, activeWorkspace, switchWorkspace, createWorkspace } =
+    useWorkspace();
 
   return (
     <div className="px-4 py-2">
@@ -21,14 +22,16 @@ export function WorkspaceSwitcher({ isExpanded }: { isExpanded: boolean }) {
               <div
                 className={cn(
                   "flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[10px] font-bold text-white",
-                  activeWorkspace.color,
+                  activeWorkspace?.color || "bg-accent-purple",
                 )}
               >
-                {activeWorkspace.name.charAt(0).toUpperCase()}
+                {activeWorkspace?.name
+                  ? activeWorkspace.name.charAt(0).toUpperCase()
+                  : "P"}
               </div>
               {isExpanded && (
                 <span className="text-text-primary max-w-[120px] truncate font-semibold">
-                  {activeWorkspace.name}
+                  {activeWorkspace?.name || "Personal Hub"}
                 </span>
               )}
             </div>
@@ -49,21 +52,33 @@ export function WorkspaceSwitcher({ isExpanded }: { isExpanded: boolean }) {
             )}
           </button>
         }
-        items={workspaces.map((ws) => ({
-          id: ws.id,
-          label: ws.name,
-          icon: (
-            <div
-              className={cn(
-                "flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-[8px] font-bold text-white",
-                ws.color,
-              )}
-            >
-              {ws.name.charAt(0).toUpperCase()}
-            </div>
-          ),
-          onClick: () => switchWorkspace(ws.id),
-        }))}
+        items={[
+          ...workspaces.map((ws) => ({
+            id: ws.id,
+            label: ws.name,
+            icon: (
+              <div
+                className={cn(
+                  "flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-[8px] font-bold text-white",
+                  ws.color,
+                )}
+              >
+                {ws.name.charAt(0).toUpperCase()}
+              </div>
+            ),
+            onClick: () => switchWorkspace(ws.id),
+          })),
+          {
+            id: "create_new_workspace",
+            label: "+ Create Workspace",
+            onClick: () => {
+              const name = prompt("Enter new workspace name:");
+              if (name && name.trim()) {
+                createWorkspace(name);
+              }
+            },
+          },
+        ]}
         align="left"
       />
     </div>
