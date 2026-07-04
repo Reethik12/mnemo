@@ -16,7 +16,9 @@ export const auth = betterAuth({
       sendMagicLink: async ({ email, url }) => {
         if (!env.SMTP_HOST) {
           console.error("Missing SMTP_HOST. Cannot send magic link.");
-          throw new Error("SMTP configuration is missing. Cannot send magic link.");
+          throw new Error(
+            "SMTP configuration is missing. Cannot send magic link.",
+          );
         }
         console.log(`[MAGIC LINK] Would send magic link to ${email}: ${url}`);
       },
@@ -34,6 +36,6 @@ export const auth = betterAuth({
   },
   secret: env.BETTER_AUTH_SECRET || "default_secret_for_development",
   trustedOrigins: env.BETTER_AUTH_URL
-    ? [env.BETTER_AUTH_URL]
-    : ["http://localhost:3000"],
+    ? [env.BETTER_AUTH_URL, "https://mnemo-z6o6.vercel.app"]
+    : ["https://mnemo-z6o6.vercel.app"],
 });
