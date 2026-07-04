@@ -1,15 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
-import { Card } from "@/components/ui/card";
-import { ComingSoonBadge } from "@/components/shared/coming-soon-badge";
-import { EmptyState } from "@/components/shared/empty-state";
 import { MODULE_CARDS } from "@/lib/constants";
 
 export default function IntelligencePage() {
-  const router = useRouter();
   const moduleData = MODULE_CARDS.find((m) => m.id === "living-intelligence")!;
 
   return (
@@ -43,47 +38,10 @@ export default function IntelligencePage() {
               <h1 className="text-text-primary text-2xl font-bold tracking-tight">
                 {moduleData.title}
               </h1>
-              <ComingSoonBadge />
             </div>
             <p className="text-text-secondary mt-1">{moduleData.description}</p>
           </div>
         </div>
-      </motion.div>
-
-      <motion.div variants={fadeInUp}>
-        <Card
-          variant="glass"
-          className="border-accent-purple-light/20 relative overflow-hidden"
-        >
-          <div
-            className="pointer-events-none absolute inset-0 opacity-30"
-            style={{
-              background: `radial-gradient(circle at top right, ${moduleData.glowColor}, transparent 50%)`,
-            }}
-            aria-hidden="true"
-          />
-          <EmptyState
-            icon={
-              <svg
-                className="text-accent-purple-light h-12 w-12"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
-                />
-              </svg>
-            }
-            title="Awakening Intelligence"
-            description="Living Intelligence is currently in training. It will soon provide deep reasoning across your entire memory graph."
-            actionLabel="Return to Dashboard"
-            onAction={() => router.push("/dashboard")}
-          />
-        </Card>
       </motion.div>
     </motion.div>
   );

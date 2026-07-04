@@ -1,15 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
-import { Card } from "@/components/ui/card";
-import { ComingSoonBadge } from "@/components/shared/coming-soon-badge";
-import { EmptyState } from "@/components/shared/empty-state";
 import { MODULE_CARDS } from "@/lib/constants";
 
 export default function ExchangePage() {
-  const router = useRouter();
   const moduleData = MODULE_CARDS.find((m) => m.id === "memory-exchange")!;
 
   return (
@@ -43,47 +38,10 @@ export default function ExchangePage() {
               <h1 className="text-text-primary text-2xl font-bold tracking-tight">
                 {moduleData.title}
               </h1>
-              <ComingSoonBadge />
             </div>
             <p className="text-text-secondary mt-1">{moduleData.description}</p>
           </div>
         </div>
-      </motion.div>
-
-      <motion.div variants={fadeInUp}>
-        <Card
-          variant="glass"
-          className="border-accent-cyan/20 relative overflow-hidden"
-        >
-          <div
-            className="pointer-events-none absolute inset-0 opacity-30"
-            style={{
-              background: `radial-gradient(circle at top right, ${moduleData.glowColor}, transparent 50%)`,
-            }}
-            aria-hidden="true"
-          />
-          <EmptyState
-            icon={
-              <svg
-                className="text-accent-cyan h-12 w-12"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
-                />
-              </svg>
-            }
-            title="Preparing the Exchange"
-            description="Memory Exchange is coming soon. Securely share and collaborate on memories with granular permissions."
-            actionLabel="Return to Dashboard"
-            onAction={() => router.push("/dashboard")}
-          />
-        </Card>
       </motion.div>
     </motion.div>
   );

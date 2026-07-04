@@ -11,6 +11,7 @@ import { ComingSoonBadge } from "@/components/shared/coming-soon-badge";
 interface SidebarItemProps {
   id: string;
   label: string;
+  subtitle?: string;
   href: string;
   iconKey: string;
   badge?: string;
@@ -195,6 +196,7 @@ function SidebarIcon({ iconKey }: { iconKey: string }) {
 
 export function SidebarItem({
   label,
+  subtitle,
   href,
   iconKey,
   badge,
@@ -228,7 +230,14 @@ export function SidebarItem({
 
       {isExpanded && (
         <>
-          <span className="flex-1 truncate text-sm font-medium">{label}</span>
+          <div className="flex flex-1 flex-col truncate">
+            <span className="truncate text-sm font-medium">{label}</span>
+            {subtitle && (
+              <span className="text-text-tertiary truncate text-[10px]">
+                {subtitle}
+              </span>
+            )}
+          </div>
           {badge && (
             <ComingSoonBadge label={badge} className="px-1.5 py-0 text-[8px]" />
           )}
