@@ -11,6 +11,8 @@ import {
 import type { Notification } from "@/types/notification";
 import { notificationService } from "@/services/notification-service";
 
+import { useSession } from "@/lib/auth/client";
+
 // ─── Context Type ────────────────────────────────────
 
 export interface NotificationContextValue {
@@ -30,21 +32,31 @@ export const NotificationContext =
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { data: session, isPending } = useSession();
 
   const fetchNotifications = useCallback(async () => {
+    if (!session) return;
     setIsLoading(true);
     try {
       const data = await notificationService.getNotifications();
       setNotifications(data);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [session]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchNotifications();
-  }, [fetchNotifications]);
+    if (isPending) return;
+
+    if (session) {
+      fetchNotifications();
+    } else {
+      setIsLoading(false);
+      setNotifications([]);
+    }
+  }, [isPending, session, fetchNotifications]);
 
   const markAsRead = useCallback((id: string) => {
     setNotifications((prev) =>

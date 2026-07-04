@@ -63,12 +63,16 @@ export function Navbar() {
 
           {/* Desktop CTAs */}
           <div className="hidden items-center gap-3 md:flex">
-            <Button variant="ghost" size="sm">
-              Login
-            </Button>
-            <Button variant="primary" size="sm">
-              Get Started
-            </Button>
+            <Link href="/login">
+              <Button variant="ghost" size="sm">
+                Login
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button variant="primary" size="sm">
+                Get Started
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Hamburger */}

@@ -1,107 +1,109 @@
-/**
- * Mock authentication service.
- * Simulates authentication operations with artificial delays.
- * Designed to be swapped for real API calls later.
- */
-
 import type { User } from "@/types/user";
 import type { LoginCredentials, RegisterData } from "@/types/auth";
+import {
+  signIn,
+  signUp,
+} from "@/lib/auth/client";
 
-// ─── Mock Data ───────────────────────────────────────
+// ─── Mapper ──────────────────────────────────────────
 
-const MOCK_USER: User = {
-  id: "usr_mnemo_001",
-  name: "Alex Chen",
-  email: "alex@mnemo.ai",
-  workspace: {
-    id: "ws_default_001",
-    name: "Personal Workspace",
+export function mapBetterAuthUser(user: Record<string, unknown>): User {
+  return {
+    id: String(user.id || ""),
+    name: String(user.name || "User"),
+    email: String(user.email || ""),
+    workspace: {
+      id: "ws_default_001",
+      name: "Personal Workspace",
+      plan: "free",
+      memberSince: String(user.createdAt || new Date().toISOString()),
+    },
     plan: "free",
-    memberSince: "2025-01-15",
-  },
-  plan: "free",
-  createdAt: "2025-01-15T09:00:00Z",
-};
-
-const MOCK_CREDENTIALS = {
-  email: "alex@mnemo.ai",
-  password: "mnemo123",
-};
-
-/** Simulate network delay */
-function delay(ms = 800): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+    createdAt: String(user.createdAt || new Date().toISOString()),
+  };
 }
 
 // ─── Service ─────────────────────────────────────────
 
 export const authService = {
-  /**
-   * Authenticate a user with email and password.
-   * Mock: accepts alex@mnemo.ai / mnemo123
-   */
   async login(credentials: LoginCredentials): Promise<User> {
-    await delay();
-    if (
-      credentials.email === MOCK_CREDENTIALS.email &&
-      credentials.password === MOCK_CREDENTIALS.password
-    ) {
-      return { ...MOCK_USER };
+    const { data, error } = await signIn.email({
+      email: credentials.email,
+      password: credentials.password,
+    });
+    if (error) {
+      if (error.message?.includes("fetch failed") || error.message?.includes("connect")) {
+        throw new Error("Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.");
+      }
+      throw new Error(error.message || "Failed to login");
     }
-    throw new Error("Invalid email or password. Try alex@mnemo.ai / mnemo123");
+    return mapBetterAuthUser(data.user as Record<string, unknown>);
   },
 
-  /**
-   * Register a new user.
-   * Mock: always succeeds and returns a user with the provided data.
-   */
+  async loginWithGoogle(): Promise<User> {
+    const { error } = await signIn.social({
+      provider: "google",
+      callbackURL: "/dashboard",
+    });
+    if (error) {
+      if (error.message?.includes("Provider not found")) {
+        throw new Error(
+          "Google OAuth is not configured. You must set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables. Obtain these from the Google Cloud Console (APIs & Services > Credentials).",
+        );
+      }
+      if (error.message?.includes("fetch failed") || error.message?.includes("connect")) {
+        throw new Error("Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.");
+      }
+      throw new Error(error.message || "Failed to login with Google");
+    }
+    // Browser will redirect, return dummy user to satisfy type
+    return mapBetterAuthUser({ id: "", email: "", name: "" });
+  },
+
+  async loginWithMagicLink(email: string): Promise<void> {
+    const { error } = await signIn.magicLink({ email });
+    if (error) {
+      if (error.message?.includes("fetch failed") || error.message?.includes("connect")) {
+        throw new Error("Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.");
+      }
+      throw new Error(
+        "SMTP Configuration is missing. You must configure SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASSWORD in your environment variables to send Magic Links.",
+      );
+    }
+  },
+
   async register(data: RegisterData): Promise<User> {
-    await delay(1000);
-    return {
-      ...MOCK_USER,
-      id: `usr_${Date.now()}`,
-      name: data.name,
+    const { data: resultData, error } = await signUp.email({
       email: data.email,
-      createdAt: new Date().toISOString(),
-    };
-  },
-
-  /**
-   * Request a password reset email.
-   * Mock: always succeeds.
-   */
-  async forgotPassword(email: string): Promise<void> {
-    console.debug("Forgot password for", email);
-    await delay();
-  },
-
-  /**
-   * Reset password with a token.
-   * Mock: always succeeds.
-   */
-  async resetPassword(token: string, newPassword: string): Promise<boolean> {
-    console.debug("Resetting with", token, newPassword);
-    await delay();
-    return true;
-  },
-
-  /**
-   * Verify email with a code.
-   * Mock: accepts "000000" as the valid code.
-   */
-  async verifyEmail(code: string): Promise<boolean> {
-    console.debug("Verifying", code);
-    await delay();
-    if (code !== "000000") {
-      throw new Error("Invalid verification code. Try 000000");
+      password: data.password,
+      name: data.name,
+    });
+    if (error) {
+      if (error.message?.includes("fetch failed") || error.message?.includes("connect") || error.message?.includes("PrismaClientInitializationError") || error.message?.includes("P1001")) {
+        throw new Error("Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.");
+      }
+      throw new Error(error.message || "Failed to register");
     }
-    return true;
+    return mapBetterAuthUser(resultData.user as Record<string, unknown>);
   },
 
-  /**
-   * Get the mock user for session restoration.
-   */
+  async forgotPassword(_email: string): Promise<void> {
+    throw new Error("SMTP and Better Auth email verification configuration required for password reset.");
+  },
+
+  async resetPassword(_token: string, _newPassword: string): Promise<boolean> {
+    throw new Error("SMTP and Better Auth email verification configuration required for password reset.");
+  },
+
+  async verifyEmail(_code: string): Promise<boolean> {
+    throw new Error("SMTP configuration required for email verification.");
+  },
+
   getMockUser(): User {
-    return { ...MOCK_USER };
+    return mapBetterAuthUser({
+      id: "usr_mnemo_001",
+      name: "Alex Chen",
+      email: "alex@mnemo.ai",
+    });
   },
 };

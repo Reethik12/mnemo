@@ -13,7 +13,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, loginWithGoogle, loginWithMagicLink } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -49,7 +49,21 @@ export default function LoginPage() {
         </>
       }
     >
-      <SocialLoginButtons isLoading={isLoading} />
+      <SocialLoginButtons
+        isLoading={isLoading}
+        onGoogleClick={() => {
+          loginWithGoogle().then(() => router.push("/dashboard"));
+        }}
+        onMagicLinkClick={() => {
+          if (!email) {
+            setError("Please enter your email for the magic link");
+            return;
+          }
+          loginWithMagicLink(email).then(() => {
+            setError("Magic link sent to your email!");
+          });
+        }}
+      />
       <AuthDivider />
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">

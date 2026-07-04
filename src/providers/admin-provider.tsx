@@ -83,9 +83,16 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(true);
-      Promise.all([loadTelemetry(), loadOrganizations()]).finally(() =>
-        setIsLoading(false),
-      );
+      const loadAll = async () => {
+        try {
+          await Promise.all([loadTelemetry(), loadOrganizations()]);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      loadAll();
     }, 0);
     return () => clearTimeout(timer);
   }, [loadTelemetry, loadOrganizations]);

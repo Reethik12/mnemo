@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 interface MemberCardProps {
@@ -74,9 +75,11 @@ export function MemberCard({
       <div className="flex items-center gap-3">
         <div className="bg-accent-purple/20 text-accent-purple border-accent-purple/10 flex h-10 w-10 items-center justify-center rounded-full border font-semibold">
           {avatar ? (
-            <img
+            <Image
               src={avatar}
               alt={name}
+              width={40}
+              height={40}
               className="h-full w-full rounded-full object-cover"
             />
           ) : name ? (

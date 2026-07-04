@@ -9,19 +9,26 @@ export class CogneeIndexer {
     content: string,
     workspaceId: string,
   ): Promise<void> {
-    // 1. Extract entities & relationships (mocked)
-    const node = {
-      id: `memory_${memoryId}`,
-      label: "Memory",
-      properties: { content, workspaceId },
-    };
+    const datasetId = `memory_${memoryId}`;
 
-    // 2. Add to Graph
-    await CogneeClient.addNodes([node]);
+    // 1. Add data to Cognee
+    await CogneeClient.add({
+      data: {
+        id: memoryId,
+        content,
+        workspaceId,
+        type: "Memory",
+      },
+      dataset_id: datasetId,
+    });
+
+    // 2. Trigger Cognify to build graph
+    await CogneeClient.cognify([datasetId]);
   }
 
   static async removeMemory(memoryId: string): Promise<void> {
-    // TODO: remove from graph
-    console.log(`[Cognee] Removed memory ${memoryId}`);
+    const datasetId = `memory_${memoryId}`;
+    await CogneeClient.deleteDataset(datasetId);
+    console.log(`[Cognee] Removed dataset ${datasetId}`);
   }
 }

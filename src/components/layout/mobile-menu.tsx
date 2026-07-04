@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { NAV_LINKS } from "@/lib/constants";
 import { staggerContainer, fadeInUp } from "@/lib/animations";
@@ -70,12 +71,16 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               variants={fadeInUp}
               className="mt-4 flex w-full max-w-xs flex-col gap-3"
             >
-              <Button variant="ghost" size="lg" onClick={onClose}>
-                Login
-              </Button>
-              <Button variant="primary" size="lg" onClick={onClose}>
-                Get Started
-              </Button>
+              <Link href="/login" className="w-full" onClick={onClose}>
+                <Button variant="ghost" size="lg" className="w-full">
+                  Login
+                </Button>
+              </Link>
+              <Link href="/register" className="w-full" onClick={onClose}>
+                <Button variant="primary" size="lg" className="w-full">
+                  Get Started
+                </Button>
+              </Link>
             </motion.div>
           </motion.nav>
         </motion.div>

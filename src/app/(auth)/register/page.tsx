@@ -14,7 +14,8 @@ import { useAuth } from "@/hooks/use-auth";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register } = useAuth();
+  const { register, loginWithGoogle, loginWithMagicLink } = useAuth();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,17 +32,27 @@ export default function RegisterPage() {
       setError("Passwords do not match");
       return;
     }
+
     if (!acceptTerms) {
       setError("Please accept the terms and conditions");
       return;
     }
 
     setIsLoading(true);
+
     try {
-      await register({ name, email, password });
-      router.push("/verify-email");
+      await register({
+        name,
+        email,
+        password,
+      });
+
+      // Registration successful → Go directly to dashboard
+      router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      setError(
+        err instanceof Error ? err.message : "Registration failed"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +74,29 @@ export default function RegisterPage() {
         </>
       }
     >
-      <SocialLoginButtons isLoading={isLoading} />
+      <SocialLoginButtons
+        isLoading={isLoading}
+        onGoogleClick={() => {
+          loginWithGoogle().catch((err) => {
+            setError(err instanceof Error ? err.message : "Google login failed");
+          });
+        }}
+        onMagicLinkClick={() => {
+          if (!email) {
+            setError("Please enter your email for the magic link");
+            return;
+          }
+
+          loginWithMagicLink(email)
+            .then(() => {
+              setError("Magic link sent to your email!");
+            })
+            .catch((err) => {
+              setError(err instanceof Error ? err.message : "Failed to send magic link");
+            });
+        }}
+      />
+
       <AuthDivider />
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -76,6 +109,7 @@ export default function RegisterPage() {
           required
           autoComplete="name"
         />
+
         <Input
           label="Email"
           type="email"
@@ -85,6 +119,7 @@ export default function RegisterPage() {
           required
           autoComplete="email"
         />
+
         <div>
           <PasswordInput
             label="Password"
@@ -96,6 +131,7 @@ export default function RegisterPage() {
           />
           <PasswordStrength password={password} />
         </div>
+
         <PasswordInput
           label="Confirm Password"
           placeholder="Confirm your password"
@@ -126,7 +162,8 @@ export default function RegisterPage() {
           <span>
             I agree to the{" "}
             <span className="text-accent-purple-light">Terms of Service</span>{" "}
-            and <span className="text-accent-purple-light">Privacy Policy</span>
+            and{" "}
+            <span className="text-accent-purple-light">Privacy Policy</span>
           </span>
         </label>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { SITE } from "@/lib/constants";
 import { staggerContainer, fadeInUp, transitions } from "@/lib/animations";
@@ -99,30 +100,34 @@ export function Hero() {
           variants={fadeInUp}
           className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
         >
-          <Button
-            variant="primary"
-            size="lg"
-            rightIcon={
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            }
-          >
-            Get Started
-          </Button>
-          <Button variant="secondary" size="lg">
-            Learn More
-          </Button>
+          <Link href="/register">
+            <Button
+              variant="primary"
+              size="lg"
+              rightIcon={
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              }
+            >
+              Get Started
+            </Button>
+          </Link>
+          <Link href="/dashboard">
+            <Button variant="secondary" size="lg">
+              Go to Dashboard
+            </Button>
+          </Link>
         </motion.div>
 
         {/* Scroll Indicator */}

@@ -4,14 +4,13 @@ import {
   createContext,
   useState,
   useCallback,
-  useEffect,
   useMemo,
   type ReactNode,
 } from "react";
 import type { User } from "@/types/user";
 import type { LoginCredentials, RegisterData } from "@/types/auth";
-import { authService } from "@/services/auth-service";
-import { sessionService } from "@/services/session-service";
+import { authService, mapBetterAuthUser } from "@/services/auth-service";
+import { useSession, signOut } from "@/lib/auth/client";
 
 // ─── Context Type ────────────────────────────────────
 
@@ -20,6 +19,8 @@ export interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
+  loginWithMagicLink: (email: string) => Promise<void>;
   register: (data: RegisterData) => Promise<User>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<void>;
@@ -33,61 +34,93 @@ export const AuthContext = createContext<AuthContextValue | null>(null);
 // ─── Provider ────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: session, isPending: isSessionLoading } = useSession();
+  const [isMutating, setIsMutating] = useState(false);
 
-  // Restore session on mount
-  useEffect(() => {
-    const stored = sessionService.getSession();
-    if (stored) {
-      setTimeout(() => setUser(stored), 0);
-    }
-    setTimeout(() => setIsLoading(false), 0);
-  }, []);
+  // Only block rendering if it's loading AND we don't have session data yet
+  const isLoading = (isSessionLoading && session === undefined) || isMutating;
+
+  const user = useMemo(() => {
+    if (!session?.user) return null;
+    return mapBetterAuthUser(session.user as Record<string, unknown>);
+  }, [session?.user]);
 
   const login = useCallback(async (credentials: LoginCredentials) => {
-    setIsLoading(true);
+    setIsMutating(true);
     try {
-      const loggedInUser = await authService.login(credentials);
-      sessionService.setSession(loggedInUser);
-      setUser(loggedInUser);
+      await authService.login(credentials);
     } finally {
-      setIsLoading(false);
+      setIsMutating(false);
+    }
+  }, []);
+
+  const loginWithGoogle = useCallback(async () => {
+    setIsMutating(true);
+    try {
+      await authService.loginWithGoogle();
+    } finally {
+      setIsMutating(false);
+    }
+  }, []);
+
+  const loginWithMagicLink = useCallback(async (email: string) => {
+    setIsMutating(true);
+    try {
+      await authService.loginWithMagicLink(email);
+    } finally {
+      setIsMutating(false);
     }
   }, []);
 
   const register = useCallback(async (data: RegisterData): Promise<User> => {
-    setIsLoading(true);
+    setIsMutating(true);
     try {
-      const newUser = await authService.register(data);
-      sessionService.setSession(newUser);
-      setUser(newUser);
-      return newUser;
+      return await authService.register(data);
     } finally {
-      setIsLoading(false);
+      setIsMutating(false);
     }
   }, []);
 
-  const logout = useCallback(() => {
-    sessionService.clearSession();
-    setUser(null);
+  const logout = useCallback(async () => {
+    setIsMutating(true);
+    try {
+      await signOut();
+      window.location.href = "/login";
+    } finally {
+      setIsMutating(false);
+    }
   }, []);
 
   const forgotPassword = useCallback(async (email: string) => {
-    await authService.forgotPassword(email);
+    setIsMutating(true);
+    try {
+      await authService.forgotPassword(email);
+    } finally {
+      setIsMutating(false);
+    }
   }, []);
 
   const resetPassword = useCallback(async (token: string, password: string) => {
-    await authService.resetPassword(token, password);
+    setIsMutating(true);
+    try {
+      await authService.resetPassword(token, password);
+    } finally {
+      setIsMutating(false);
+    }
   }, []);
 
   const verifyEmail = useCallback(async (code: string) => {
-    await authService.verifyEmail(code);
+    setIsMutating(true);
+    try {
+      await authService.verifyEmail(code);
+    } finally {
+      setIsMutating(false);
+    }
   }, []);
 
-  const handleSetUser = useCallback((updatedUser: User) => {
-    sessionService.setSession(updatedUser);
-    setUser(updatedUser);
+  const handleSetUser = useCallback((_updatedUser: User) => {
+    // With Better Auth managing the session natively, manually setting 
+    // the user context is an anti-pattern. Updates should go through Better Auth.
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -96,6 +129,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: !!user,
       isLoading,
       login,
+      loginWithGoogle,
+      loginWithMagicLink,
       register,
       logout,
       forgotPassword,
@@ -107,6 +142,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       isLoading,
       login,
+      loginWithGoogle,
+      loginWithMagicLink,
       register,
       logout,
       forgotPassword,

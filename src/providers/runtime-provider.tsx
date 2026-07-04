@@ -201,12 +201,21 @@ export function RuntimeProvider({ children }: { children: ReactNode }) {
     const timer = setTimeout(() => {
       if (workspaceId) {
         setIsLoading(true);
-        Promise.all([
-          loadTelemetry(),
-          loadDecisions(),
-          loadSchedules(),
-          loadRecommendations(),
-        ]).finally(() => setIsLoading(false));
+        const loadAll = async () => {
+          try {
+            await Promise.all([
+              loadTelemetry(),
+              loadDecisions(),
+              loadSchedules(),
+              loadRecommendations(),
+            ]);
+          } catch (e) {
+            console.error(e);
+          } finally {
+            setIsLoading(false);
+          }
+        };
+        loadAll();
       }
     }, 0);
     return () => clearTimeout(timer);

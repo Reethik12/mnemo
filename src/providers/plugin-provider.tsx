@@ -71,9 +71,16 @@ export function PluginProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(true);
-      Promise.all([loadPlugins(), loadMCPTools()]).finally(() =>
-        setIsLoading(false),
-      );
+      const loadAll = async () => {
+        try {
+          await Promise.all([loadPlugins(), loadMCPTools()]);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      loadAll();
     }, 0);
     return () => clearTimeout(timer);
   }, [loadPlugins, loadMCPTools]);

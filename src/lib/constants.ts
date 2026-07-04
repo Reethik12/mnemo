@@ -249,6 +249,30 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
         iconKey: "home",
       },
       {
+        id: "memory",
+        label: "Memories",
+        href: "/memory",
+        iconKey: "brain",
+      },
+      {
+        id: "knowledge",
+        label: "Knowledge Base",
+        href: "/knowledge",
+        iconKey: "network",
+      },
+      {
+        id: "conversation",
+        label: "Conversations",
+        href: "/conversation",
+        iconKey: "share",
+      },
+      {
+        id: "ai",
+        label: "AI Center",
+        href: "/ai",
+        iconKey: "brain",
+      },
+      {
         id: "agents",
         label: "AI Agents",
         href: "/agents",
@@ -473,14 +497,14 @@ export const QUICK_ACTIONS: QuickAction[] = [
     title: "New Memory",
     description: "Create a new memory",
     iconKey: "plus",
-    disabled: true,
+    href: "/memory",
   },
   {
     id: "import",
     title: "Import Data",
     description: "Import from external sources",
     iconKey: "upload",
-    disabled: true,
+    href: "/knowledge",
   },
   {
     id: "explore",
@@ -677,6 +701,7 @@ export const USER_MENU_ITEMS: UserMenuItem[] = [
     iconKey: "settings",
   },
   { id: "help", label: "Help", href: "/help", iconKey: "help" },
+  { id: "logout", label: "Logout", iconKey: "logout", action: "logout" },
 ];
 
 // ═══════════════════════════════════════════════════════

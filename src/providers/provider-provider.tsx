@@ -128,7 +128,7 @@ interface ProviderContextValue extends ProviderState {
   updateConfiguration: (
     providerId: string,
     config: ProviderConfiguration,
-  ) => void;
+  ) => Promise<void>;
   checkHealth: (providerId: string) => Promise<void>;
   testConnection: (providerId: string) => Promise<void>;
 }
@@ -181,8 +181,13 @@ export function ProviderProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const updateConfiguration = useCallback(
-    (providerId: string, config: ProviderConfiguration) => {
-      dispatch({ type: "SET_CONFIGURATION", payload: { providerId, config } });
+    async (providerId: string, config: ProviderConfiguration) => {
+      try {
+        await ProviderManagementService.updateProvider(providerId, config);
+        dispatch({ type: "SET_CONFIGURATION", payload: { providerId, config } });
+      } catch (error) {
+        console.error("Failed to update provider configuration:", error);
+      }
     },
     [],
   );

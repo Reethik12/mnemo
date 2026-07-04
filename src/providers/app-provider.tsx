@@ -26,6 +26,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
       <AuthProvider>
+        {children}
+        {/*
         <WorkspaceProvider>
           <RealtimeProvider>
             <AgentProvider>
@@ -49,6 +51,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             </AgentProvider>
           </RealtimeProvider>
         </WorkspaceProvider>
+        */}
       </AuthProvider>
     </ThemeProvider>
   );

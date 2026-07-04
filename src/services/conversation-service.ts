@@ -141,10 +141,10 @@ export class ConversationWorkspaceService {
   }
 
   static async favoriteConversation(
-    id: string,
-    isFavorite?: boolean,
+    _id: string,
+    _isFavorite?: boolean,
   ): Promise<Conversation> {
-    return this.loadConversation(id);
+    return this.loadConversation(_id);
   }
 
   static async togglePin(
@@ -168,9 +168,7 @@ export class ConversationWorkspaceService {
     return this.loadConversation(id);
   }
 
-  static async searchConversations(
-    query: string,
-  ): Promise<{
+  static async searchConversations(query: string): Promise<{
     query: string;
     results: ConversationSummary[];
     isSearching: boolean;
