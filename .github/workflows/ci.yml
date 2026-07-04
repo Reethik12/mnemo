@@ -2,9 +2,11 @@ name: Mnemo Continuous Integration
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   validate:
@@ -14,43 +16,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-size: 20
+          node-version: 22
+          cache: "pnpm"
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          version: 9.9.0
-
-      - name: Get pnpm cache directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          version: 10
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run Prisma Generate
+      - name: Generate Prisma Client
         run: pnpm prisma generate
 
-      - name: Verify typings
+      - name: Type Check
         run: pnpm type-check
 
-      - name: Run ESLint checks
+      - name: Run ESLint
         run: pnpm lint
 
-      - name: Validate Next.js build
+      - name: Build Next.js
         run: pnpm build
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/mnemo?schema=public"
           BETTER_AUTH_SECRET: "mock_better_auth_secret_for_tests"
+          BETTER_AUTH_URL: "http://localhost:3000"
