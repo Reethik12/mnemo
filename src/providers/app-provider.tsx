@@ -3,6 +3,18 @@
 import type { ReactNode } from "react";
 import { AuthProvider } from "./auth-provider";
 import { ThemeProvider } from "./theme-provider";
+import { WorkspaceProvider } from "./workspace-provider";
+import { RealtimeProvider } from "./realtime-provider";
+import { AgentProvider } from "./agent-provider";
+import { PlannerProvider } from "./planner-provider";
+import { OrchestratorProvider } from "./orchestrator-provider";
+import { RuntimeProvider } from "./runtime-provider";
+import { DeveloperProvider } from "./developer-provider";
+import { PluginProvider } from "./plugin-provider";
+import { AdminProvider } from "./admin-provider";
+import { NotificationProvider } from "./notification-provider";
+import { ToastProvider } from "./toast-provider";
+import { MemoryProvider } from "./memory-provider";
 
 // ─── Composed Provider ───────────────────────────────
 
@@ -14,8 +26,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
       <AuthProvider>
-        {children}
-        {/*
         <WorkspaceProvider>
           <RealtimeProvider>
             <AgentProvider>
@@ -39,7 +49,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
             </AgentProvider>
           </RealtimeProvider>
         </WorkspaceProvider>
-        */}
       </AuthProvider>
     </ThemeProvider>
   );
