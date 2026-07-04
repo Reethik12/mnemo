@@ -1,26 +1,25 @@
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient({
-  accelerateUrl: process.env.DATABASE_URL,
-});
+import { db as prisma } from "../src/lib/db";
 
 async function main() {
-  console.log("Seeding database...");
+  console.log("🌱 Seeding database...");
 
   const user = await prisma.user.upsert({
-    where: { id: "00000000-0000-0000-0000-000000000000" },
+    where: {
+      id: "00000000-0000-0000-0000-000000000000",
+    },
     update: {},
     create: {
       id: "00000000-0000-0000-0000-000000000000",
       email: "system@mnemo.ai",
       name: "System Admin",
-      // BetterAuth usually manages this, but this is a mock seed
     },
   });
 
   await prisma.workspace.upsert({
-    where: { id: "00000000-0000-0000-0000-000000000000" },
+    where: {
+      id: "00000000-0000-0000-0000-000000000000",
+    },
     update: {},
     create: {
       id: "00000000-0000-0000-0000-000000000000",
@@ -29,63 +28,68 @@ async function main() {
     },
   });
 
-  // Providers
   const providers = [
     {
       id: "openai",
       name: "OpenAI",
-      description: "Industry-leading foundation models.",
-      status: "active",
-      icon: "O",
-      website: "https://openai.com",
-      capabilities: { hasVision: true, hasFunctionCalling: true },
+      apiKey: null,
+      baseUrl: "https://api.openai.com/v1",
+      capabilities: {
+        hasVision: true,
+        hasFunctionCalling: true,
+      },
     },
     {
       id: "anthropic",
       name: "Anthropic",
-      description: "Highly capable and safe models.",
-      status: "active",
-      icon: "A",
-      website: "https://anthropic.com",
-      capabilities: { hasVision: true, hasFunctionCalling: true },
+      apiKey: null,
+      baseUrl: "https://api.anthropic.com",
+      capabilities: {
+        hasVision: true,
+        hasFunctionCalling: true,
+      },
     },
     {
       id: "gemini",
       name: "Google Gemini",
-      description: "Google's multimodal powerhouse.",
-      status: "active",
-      icon: "G",
-      website: "https://deepmind.google",
-      capabilities: { hasVision: true, hasFunctionCalling: true },
+      apiKey: null,
+      baseUrl: "https://generativelanguage.googleapis.com",
+      capabilities: {
+        hasVision: true,
+        hasFunctionCalling: true,
+      },
     },
     {
       id: "groq",
       name: "Groq",
-      description: "Ultra-low latency LPU inference.",
-      status: "active",
-      icon: "Q",
-      website: "https://groq.com",
-      capabilities: { hasVision: false, hasFunctionCalling: true },
+      apiKey: null,
+      baseUrl: "https://api.groq.com/openai/v1",
+      capabilities: {
+        hasVision: false,
+        hasFunctionCalling: true,
+      },
     },
   ];
 
-  for (const p of providers) {
+  for (const provider of providers) {
     await prisma.provider.upsert({
-      where: { id: p.id },
-      update: { ...p },
-      create: { ...p },
+      where: {
+        id: provider.id,
+      },
+      update: provider,
+      create: provider,
     });
   }
 
-  console.log("Seeding complete.");
+  console.log("✅ Database seeded successfully!");
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
+  .catch((error) => {
+    console.error("❌ Seed failed:");
+    console.error(error);
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });
