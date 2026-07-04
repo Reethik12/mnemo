@@ -4,7 +4,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { cardAppear } from "@/lib/animations";
-import { ComingSoonBadge } from "@/components/shared/coming-soon-badge";
 import type { ModuleCard as ModuleCardType } from "@/lib/constants";
 
 // ─── Component ───────────────────────────────────────
@@ -62,7 +61,6 @@ export function ModuleCard({ module, index = 0 }: ModuleCardProps) {
                   />
                 </svg>
               </div>
-              <ComingSoonBadge />
             </div>
 
             {/* Content */}

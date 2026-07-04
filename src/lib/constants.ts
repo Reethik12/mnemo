@@ -240,7 +240,7 @@ import type { SidebarSection } from "@/types/navigation";
 
 export const SIDEBAR_SECTIONS: SidebarSection[] = [
   {
-    title: "Main",
+    title: "",
     items: [
       {
         id: "dashboard",
@@ -249,144 +249,40 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
         iconKey: "home",
       },
       {
-        id: "memory",
-        label: "Memories",
-        href: "/memory",
-        iconKey: "brain",
-      },
-      {
-        id: "knowledge",
-        label: "Knowledge Base",
-        href: "/knowledge",
-        iconKey: "network",
-      },
-      {
-        id: "conversation",
-        label: "Conversations",
-        href: "/conversation",
-        iconKey: "share",
-      },
-      {
-        id: "ai",
-        label: "AI Center",
-        href: "/ai",
-        iconKey: "brain",
-      },
-      {
-        id: "agents",
-        label: "AI Agents",
-        href: "/agents",
-        iconKey: "brain",
-      },
-      {
-        id: "planner",
-        label: "Planner",
-        href: "/planner",
-        iconKey: "clock",
-      },
-      {
-        id: "workflows",
-        label: "Workflows",
-        href: "/workflows",
-        iconKey: "network",
-      },
-      {
-        id: "autonomous",
-        label: "Autonomous",
-        href: "/autonomous",
-        iconKey: "settings",
-      },
-    ],
-  },
-  {
-    title: "Ecosystem & Platform",
-    items: [
-      {
-        id: "developer",
-        label: "Developer APIs",
-        href: "/developer",
-        iconKey: "settings",
-      },
-      {
-        id: "plugins",
-        label: "Plugins Registry",
-        href: "/plugins",
-        iconKey: "settings",
-      },
-      {
-        id: "admin",
-        label: "Platform Admin",
-        href: "/admin",
-        iconKey: "settings",
-      },
-    ],
-  },
-
-  {
-    title: "Modules",
-    items: [
-      {
         id: "fabric",
         label: "Memory Fabric",
         href: "/dashboard/fabric",
         iconKey: "network",
-        badge: "Soon",
-        disabled: true,
-      },
-      {
-        id: "intelligence",
-        label: "Living Intelligence",
-        href: "/dashboard/intelligence",
-        iconKey: "brain",
-        badge: "Soon",
-        disabled: true,
       },
       {
         id: "exchange",
         label: "Memory Exchange",
         href: "/dashboard/exchange",
         iconKey: "share",
-        badge: "Soon",
-        disabled: true,
       },
       {
-        id: "timeline",
-        label: "Time Machine",
-        href: "/dashboard/timeline",
-        iconKey: "clock",
-        badge: "Soon",
-        disabled: true,
+        id: "intelligence",
+        label: "Living Intelligence",
+        href: "/dashboard/intelligence",
+        iconKey: "brain",
       },
       {
-        id: "permissions",
-        label: "Permissions",
-        href: "/dashboard/permissions",
-        iconKey: "shield",
-        badge: "Soon",
-        disabled: true,
+        id: "search",
+        label: "Mnemo Search",
+        href: "/search",
+        iconKey: "search",
       },
-    ],
-  },
-  {
-    title: "System",
-    items: [
       {
-        id: "settings",
-        label: "Settings",
-        href: "/settings",
-        iconKey: "settings",
+        id: "agents",
+        label: "Mnemo Agents",
+        href: "/agents",
+        iconKey: "brain",
       },
       {
         id: "profile",
         label: "Profile",
         href: "/profile",
         iconKey: "user",
-      },
-      {
-        id: "help",
-        label: "Help",
-        href: "/help",
-        iconKey: "help",
       },
     ],
   },
@@ -586,25 +482,14 @@ export interface ModuleCard {
 export const MODULE_CARDS: ModuleCard[] = [
   {
     id: "memory-fabric",
-    title: "Universal Memory Fabric",
+    title: "Memory Fabric",
     description:
       "One connected knowledge graph from every memory source. Your data woven into a persistent, intelligent fabric.",
     iconKey: "network",
     gradient: "from-[#6D5BFF] to-[#8F7DFF]",
     glowColor: "rgba(109, 91, 255, 0.2)",
     href: "/dashboard/fabric",
-    status: "coming-soon",
-  },
-  {
-    id: "living-intelligence",
-    title: "Living Intelligence",
-    description:
-      "AI that understands, connects, and reasons across your memories. Not search — understanding.",
-    iconKey: "brain",
-    gradient: "from-[#8F7DFF] to-[#B794F4]",
-    glowColor: "rgba(143, 125, 255, 0.2)",
-    href: "/dashboard/intelligence",
-    status: "coming-soon",
+    status: "active",
   },
   {
     id: "memory-exchange",
@@ -615,29 +500,40 @@ export const MODULE_CARDS: ModuleCard[] = [
     gradient: "from-[#4CC9F0] to-[#6DD5FA]",
     glowColor: "rgba(76, 201, 240, 0.2)",
     href: "/dashboard/exchange",
-    status: "coming-soon",
+    status: "active",
   },
   {
-    id: "time-machine",
-    title: "Memory Time Machine",
+    id: "living-intelligence",
+    title: "Living Intelligence",
     description:
-      "Replay and traverse your memories across time. See how your knowledge evolved and rediscover forgotten insights.",
-    iconKey: "clock",
+      "AI that understands, connects, and reasons across your memories. Not search — understanding.",
+    iconKey: "brain",
+    gradient: "from-[#8F7DFF] to-[#B794F4]",
+    glowColor: "rgba(143, 125, 255, 0.2)",
+    href: "/dashboard/intelligence",
+    status: "active",
+  },
+  {
+    id: "search",
+    title: "Mnemo Search",
+    description:
+      "Instantly find exact moments and insights across your entire memory graph.",
+    iconKey: "search",
     gradient: "from-[#6D5BFF] to-[#4CC9F0]",
     glowColor: "rgba(109, 91, 255, 0.15)",
-    href: "/dashboard/timeline",
-    status: "coming-soon",
+    href: "/search",
+    status: "active",
   },
   {
-    id: "permissions-twin",
-    title: "Permissions & Digital Twin",
+    id: "agents",
+    title: "Mnemo Agents",
     description:
-      "Complete ownership over your memory. AI representations that act on your behalf with full control.",
-    iconKey: "shield",
+      "Autonomous agents that learn from your memories and perform tasks on your behalf.",
+    iconKey: "brain",
     gradient: "from-[#B794F4] to-[#6D5BFF]",
     glowColor: "rgba(183, 148, 244, 0.2)",
-    href: "/dashboard/permissions",
-    status: "coming-soon",
+    href: "/agents",
+    status: "active",
   },
 ];
 
@@ -694,13 +590,6 @@ export interface UserMenuItem {
 
 export const USER_MENU_ITEMS: UserMenuItem[] = [
   { id: "profile", label: "Profile", href: "/profile", iconKey: "user" },
-  {
-    id: "settings",
-    label: "Settings",
-    href: "/settings",
-    iconKey: "settings",
-  },
-  { id: "help", label: "Help", href: "/help", iconKey: "help" },
   { id: "logout", label: "Logout", iconKey: "logout", action: "logout" },
 ];
 
