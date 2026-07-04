@@ -50,12 +50,16 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isPending) return;
 
-    if (session) {
-      fetchNotifications();
-    } else {
-      setIsLoading(false);
-      setNotifications([]);
-    }
+    const timer = setTimeout(() => {
+      if (session) {
+        void fetchNotifications();
+      } else {
+        setIsLoading(false);
+        setNotifications([]);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [isPending, session, fetchNotifications]);
 
   const markAsRead = useCallback((id: string) => {

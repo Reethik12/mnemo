@@ -3,18 +3,6 @@
 import type { ReactNode } from "react";
 import { AuthProvider } from "./auth-provider";
 import { ThemeProvider } from "./theme-provider";
-import { NotificationProvider } from "./notification-provider";
-import { MemoryProvider } from "./memory-provider";
-import { ToastProvider } from "./toast-provider";
-import { WorkspaceProvider } from "./workspace-provider";
-import { RealtimeProvider } from "./realtime-provider";
-import { AgentProvider } from "./agent-provider";
-import { PlannerProvider } from "./planner-provider";
-import { OrchestratorProvider } from "./orchestrator-provider";
-import { RuntimeProvider } from "./runtime-provider";
-import { DeveloperProvider } from "./developer-provider";
-import { PluginProvider } from "./plugin-provider";
-import { AdminProvider } from "./admin-provider";
 
 // ─── Composed Provider ───────────────────────────────
 

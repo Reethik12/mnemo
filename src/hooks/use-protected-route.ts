@@ -19,16 +19,19 @@ export function useProtectedRoute(): { isLoading: boolean } {
       const timer = setTimeout(() => setIsTimeout(true), 5000);
       return () => clearTimeout(timer);
     }
-    setIsTimeout(false);
+    const resetTimer = setTimeout(() => setIsTimeout(false), 0);
+    return () => clearTimeout(resetTimer);
   }, [isLoading]);
 
   useEffect(() => {
     if ((!isLoading || isTimeout) && !isAuthenticated) {
-      // Clear cookies manually to prevent infinite redirect loops with middleware 
+      // Clear cookies manually to prevent infinite redirect loops with middleware
       // when the backend is unreachable (e.g., Prisma errors)
-      document.cookie = "better-auth.session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie = "__Secure-better-auth.session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      
+      document.cookie =
+        "better-auth.session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie =
+        "__Secure-better-auth.session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
       router.replace("/login");
     }
   }, [isLoading, isTimeout, isAuthenticated, router]);

@@ -13,15 +13,17 @@ export interface CogneeSearchPayload {
 export class CogneeClient {
   private static async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
   ): Promise<T> {
     if (!cogneeConfig.enabled) {
-      console.log(`[Cognee] Skipping request to ${endpoint} because integration is disabled.`);
+      console.log(
+        `[Cognee] Skipping request to ${endpoint} because integration is disabled.`,
+      );
       return {} as T;
     }
 
     const url = `${cogneeConfig.apiUrl.replace(/\/$/, "")}${endpoint}`;
-    
+
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       ...(options.headers as Record<string, string>),
@@ -65,7 +67,7 @@ export class CogneeClient {
       // Since docs mention /api/v1 prefix, we will try the base url or just a harmless endpoint.
       await this.request("/");
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   }
@@ -73,7 +75,7 @@ export class CogneeClient {
   /**
    * Adds text, documents, or structured data to the knowledge base.
    */
-  static async add(payload: CogneeAddPayload): Promise<any> {
+  static async add(payload: CogneeAddPayload): Promise<unknown> {
     return this.request("/api/v1/add", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -83,7 +85,7 @@ export class CogneeClient {
   /**
    * Transforms raw data into structured knowledge graphs.
    */
-  static async cognify(datasets?: string[]): Promise<any> {
+  static async cognify(datasets?: string[]): Promise<unknown> {
     return this.request("/api/v1/cognify", {
       method: "POST",
       body: JSON.stringify(datasets ? { datasets } : {}),
@@ -93,7 +95,7 @@ export class CogneeClient {
   /**
    * Queries the knowledge graph using natural language.
    */
-  static async search(payload: CogneeSearchPayload): Promise<any> {
+  static async search(payload: CogneeSearchPayload): Promise<unknown> {
     return this.request("/api/v1/search", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -103,7 +105,7 @@ export class CogneeClient {
   /**
    * Removes specific data items or entire datasets.
    */
-  static async deleteDataset(datasetId: string): Promise<any> {
+  static async deleteDataset(datasetId: string): Promise<unknown> {
     return this.request(`/api/v1/datasets`, {
       method: "DELETE",
       body: JSON.stringify({ dataset_id: datasetId }),

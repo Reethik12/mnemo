@@ -12,7 +12,7 @@ export class CogneeRetriever {
    */
   static async retrieve(
     query: string,
-    workspaceId: string,
+    _workspaceId: string,
   ): Promise<GraphQueryResult[]> {
     try {
       const response = await CogneeClient.search({
@@ -22,10 +22,13 @@ export class CogneeRetriever {
 
       // Assuming the response from /api/v1/search is a list of results
       if (Array.isArray(response)) {
-        return response.map((item: any) => ({
-          nodeId: item.id || item.node_id || "unknown",
-          content: item.text || item.content || JSON.stringify(item),
-          score: item.score || 1.0,
+        return response.map((item: Record<string, unknown>) => ({
+          nodeId: (item.id as string) || (item.node_id as string) || "unknown",
+          content:
+            (item.text as string) ||
+            (item.content as string) ||
+            JSON.stringify(item),
+          score: (item.score as number) || 1.0,
         }));
       }
 
