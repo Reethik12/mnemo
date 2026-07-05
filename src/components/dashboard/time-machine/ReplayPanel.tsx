@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useReplay } from "@/hooks/useReplay";
 import { AssistantPanel } from "./AssistantPanel";
@@ -23,6 +23,7 @@ export function ReplayPanel({
     setCompareResult,
     restoreVersion,
     forgetMemory,
+    fetchReplay,
   } = useReplay();
   const [activeVersionIndex, setActiveVersionIndex] = useState<number>(0);
   const [compareMode, setCompareMode] = useState(false);
@@ -30,20 +31,9 @@ export function ReplayPanel({
   const [isRestoring, setIsRestoring] = useState(false);
   const [isForgetting, setIsForgetting] = useState(false);
 
-  // Fetch replay data on mount
-  useState(() => {
-    // This is handled by the parent or we could expose fetchReplay from the hook and call it in useEffect
-  });
-
-  // We should call fetchReplay when the panel opens. Since useReplay encapsulates it, let's just trigger it.
-  // Actually, we can use an effect:
-  const { fetchReplay } = useReplay();
-  const [fetched, setFetched] = useState(false);
-
-  if (!fetched) {
+  useEffect(() => {
     fetchReplay(memoryId);
-    setFetched(true);
-  }
+  }, [fetchReplay, memoryId]);
 
   if (isLoading || !replay) {
     return (

@@ -11,7 +11,8 @@ import { TimelineView } from "@/components/dashboard/time-machine/TimelineView";
 import { ReplayPanel } from "@/components/dashboard/time-machine/ReplayPanel";
 
 export default function TimeMachinePage() {
-  const moduleData = MODULE_CARDS.find((m) => m.id === "memory-time-machine");
+  const moduleData =
+    MODULE_CARDS.find((m) => m.id === "time-machine") || MODULE_CARDS[3];
   const { events, stats, evolution, isLoading, query, setQuery, refetch } =
     useTimeline();
   const [selectedMemoryId, setSelectedMemoryId] = useState<string | null>(null);
@@ -23,13 +24,11 @@ export default function TimeMachinePage() {
     (e) => filterType === "all" || e.type === filterType,
   );
 
-  if (!moduleData) return null;
-
   return (
     <motion.div
       variants={staggerContainer(0.1)}
-      initial="initial"
-      animate="animate"
+      initial="hidden"
+      animate="visible"
       className="space-y-12"
     >
       <motion.div
