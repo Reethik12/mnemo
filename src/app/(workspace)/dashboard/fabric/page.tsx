@@ -47,7 +47,7 @@ export default function FabricPage() {
         } else {
           setMemories([]);
         }
-      } catch (err) {
+      } catch {
         if (!mounted) return;
         setMemories([]);
       } finally {

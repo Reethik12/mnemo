@@ -58,7 +58,7 @@ export function CreateMemoryDialog({
       } else {
         setError(result.error || "Failed to create memory.");
       }
-    } catch (_err) {
+    } catch {
       setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
