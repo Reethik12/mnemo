@@ -20,7 +20,7 @@ export interface MemorySearchResult {
  */
 export async function rememberMemory(
   input: MemoryInput,
-  datasetName: string = "mnemo_fabric",
+  datasetName: string = "mnemo",
 ) {
   const formattedText = `
 Title: ${input.title}
@@ -37,7 +37,7 @@ ${input.content}
     method: "POST",
     body: JSON.stringify({
       data: [{ type: "text", text: formattedText }],
-      dataset_name: datasetName,
+      datasetName: datasetName,
     }),
   });
 
@@ -45,7 +45,7 @@ ${input.content}
   return await cogneeFetch("/api/v1/cognify", {
     method: "POST",
     body: JSON.stringify({
-      datasets: [datasetName],
+      datasetName: datasetName,
     }),
   });
 }
@@ -55,13 +55,14 @@ ${input.content}
  */
 export async function searchMemory(
   query: string,
-  _datasetName: string = "mnemo_fabric",
+  _datasetName: string = "mnemo",
 ): Promise<MemorySearchResult[]> {
   const response = await cogneeFetch("/api/v1/search", {
     method: "POST",
     body: JSON.stringify({
       query_text: query,
       query_type: "SUMMARIES",
+      datasetName: _datasetName,
     }),
   });
 
@@ -96,7 +97,7 @@ export async function searchMemory(
  * Uses `/api/v1/datasets/{datasetName}/data` endpoint.
  */
 export async function recallAllMemories(
-  _datasetName: string = "mnemo_fabric",
+  _datasetName: string = "mnemo",
 ): Promise<MemorySearchResult[]> {
   try {
     const dataItems = await cogneeFetch(
