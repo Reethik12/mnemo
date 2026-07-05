@@ -50,9 +50,7 @@ export default function RegisterPage() {
       // Registration successful → Go directly to dashboard
       router.push("/dashboard");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Registration failed"
-      );
+      setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +76,9 @@ export default function RegisterPage() {
         isLoading={isLoading}
         onGoogleClick={() => {
           loginWithGoogle().catch((err) => {
-            setError(err instanceof Error ? err.message : "Google login failed");
+            setError(
+              err instanceof Error ? err.message : "Google login failed",
+            );
           });
         }}
         onMagicLinkClick={() => {
@@ -92,7 +92,11 @@ export default function RegisterPage() {
               setError("Magic link sent to your email!");
             })
             .catch((err) => {
-              setError(err instanceof Error ? err.message : "Failed to send magic link");
+              setError(
+                err instanceof Error
+                  ? err.message
+                  : "Failed to send magic link",
+              );
             });
         }}
       />
@@ -162,8 +166,7 @@ export default function RegisterPage() {
           <span>
             I agree to the{" "}
             <span className="text-accent-purple-light">Terms of Service</span>{" "}
-            and{" "}
-            <span className="text-accent-purple-light">Privacy Policy</span>
+            and <span className="text-accent-purple-light">Privacy Policy</span>
           </span>
         </label>
 

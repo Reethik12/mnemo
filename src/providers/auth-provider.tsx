@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const handleSetUser = useCallback((_updatedUser: User) => {
-    // With Better Auth managing the session natively, manually setting 
+    // With Better Auth managing the session natively, manually setting
     // the user context is an anti-pattern. Updates should go through Better Auth.
   }, []);
 

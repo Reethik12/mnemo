@@ -43,7 +43,10 @@ export class ProviderManagementService {
     return res.map(toProvider);
   }
 
-  static async updateProvider(id: string, data: Partial<ProviderConfiguration>): Promise<Provider> {
+  static async updateProvider(
+    id: string,
+    data: Partial<ProviderConfiguration>,
+  ): Promise<Provider> {
     const res = await apiClient.patch<unknown>(`/api/providers/${id}`, data);
     return toProvider(res);
   }

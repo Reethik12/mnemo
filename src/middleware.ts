@@ -6,10 +6,10 @@ export async function middleware(request: NextRequest) {
   const isApiRoute = pathname.startsWith("/api");
   const isAuthRoute = pathname.startsWith("/api/auth");
   const isHealthRoute = pathname.startsWith("/api/health");
-  
-  // Protect dashboard/workspace routes - in Mnemo, these don't all start with /workspace, 
+
+  // Protect dashboard/workspace routes - in Mnemo, these don't all start with /workspace,
   // they are grouped in (workspace). Common ones:
-  const isProtectedUiRoute = 
+  const isProtectedUiRoute =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/agents") ||
@@ -34,8 +34,10 @@ export async function middleware(request: NextRequest) {
   const isAuthPage = pathname === "/login" || pathname === "/register";
 
   // Using simple cookie check for middleware (actual validation should happen in API routes)
-  const sessionCookie = request.cookies.get("better-auth.session_token") || request.cookies.get("__Secure-better-auth.session_token");
-  
+  const sessionCookie =
+    request.cookies.get("better-auth.session_token") ||
+    request.cookies.get("__Secure-better-auth.session_token");
+
   if (isApiRoute && !isAuthRoute && !isHealthRoute) {
     if (!sessionCookie) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -1,9 +1,6 @@
 import type { User } from "@/types/user";
 import type { LoginCredentials, RegisterData } from "@/types/auth";
-import {
-  signIn,
-  signUp,
-} from "@/lib/auth/client";
+import { signIn, signUp } from "@/lib/auth/client";
 
 // ─── Mapper ──────────────────────────────────────────
 
@@ -32,8 +29,13 @@ export const authService = {
       password: credentials.password,
     });
     if (error) {
-      if (error.message?.includes("fetch failed") || error.message?.includes("connect")) {
-        throw new Error("Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.");
+      if (
+        error.message?.includes("fetch failed") ||
+        error.message?.includes("connect")
+      ) {
+        throw new Error(
+          "Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.",
+        );
       }
       throw new Error(error.message || "Failed to login");
     }
@@ -51,8 +53,13 @@ export const authService = {
           "Google OAuth is not configured. You must set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables. Obtain these from the Google Cloud Console (APIs & Services > Credentials).",
         );
       }
-      if (error.message?.includes("fetch failed") || error.message?.includes("connect")) {
-        throw new Error("Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.");
+      if (
+        error.message?.includes("fetch failed") ||
+        error.message?.includes("connect")
+      ) {
+        throw new Error(
+          "Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.",
+        );
       }
       throw new Error(error.message || "Failed to login with Google");
     }
@@ -63,8 +70,13 @@ export const authService = {
   async loginWithMagicLink(email: string): Promise<void> {
     const { error } = await signIn.magicLink({ email });
     if (error) {
-      if (error.message?.includes("fetch failed") || error.message?.includes("connect")) {
-        throw new Error("Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.");
+      if (
+        error.message?.includes("fetch failed") ||
+        error.message?.includes("connect")
+      ) {
+        throw new Error(
+          "Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.",
+        );
       }
       throw new Error(
         "SMTP Configuration is missing. You must configure SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASSWORD in your environment variables to send Magic Links.",
@@ -79,8 +91,15 @@ export const authService = {
       name: data.name,
     });
     if (error) {
-      if (error.message?.includes("fetch failed") || error.message?.includes("connect") || error.message?.includes("PrismaClientInitializationError") || error.message?.includes("P1001")) {
-        throw new Error("Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.");
+      if (
+        error.message?.includes("fetch failed") ||
+        error.message?.includes("connect") ||
+        error.message?.includes("PrismaClientInitializationError") ||
+        error.message?.includes("P1001")
+      ) {
+        throw new Error(
+          "Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is correctly configured in .env.",
+        );
       }
       throw new Error(error.message || "Failed to register");
     }
@@ -88,11 +107,15 @@ export const authService = {
   },
 
   async forgotPassword(_email: string): Promise<void> {
-    throw new Error("SMTP and Better Auth email verification configuration required for password reset.");
+    throw new Error(
+      "SMTP and Better Auth email verification configuration required for password reset.",
+    );
   },
 
   async resetPassword(_token: string, _newPassword: string): Promise<boolean> {
-    throw new Error("SMTP and Better Auth email verification configuration required for password reset.");
+    throw new Error(
+      "SMTP and Better Auth email verification configuration required for password reset.",
+    );
   },
 
   async verifyEmail(_code: string): Promise<boolean> {

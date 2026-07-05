@@ -184,7 +184,10 @@ export function ProviderProvider({ children }: { children: React.ReactNode }) {
     async (providerId: string, config: ProviderConfiguration) => {
       try {
         await ProviderManagementService.updateProvider(providerId, config);
-        dispatch({ type: "SET_CONFIGURATION", payload: { providerId, config } });
+        dispatch({
+          type: "SET_CONFIGURATION",
+          payload: { providerId, config },
+        });
       } catch (error) {
         console.error("Failed to update provider configuration:", error);
       }
