@@ -19,19 +19,24 @@ export function ImportConnectors({ onSuccess }: { onSuccess: () => void }) {
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
   const handleImport = async (id: string, label: string) => {
+    console.log(`[UI] Button clicked for ${label}`);
     setLoadingId(id);
     try {
       // Provide mock content for the hackathon demonstration
       const mockContent = `This is simulated extracted content from a ${label} connection. It contains important insights and metadata.`;
+      console.log(`[UI] Calling importMockAction for ${label}`);
       const res = await importMockAction(label, mockContent);
+      console.log(`[UI] importMockAction returned:`, res);
       if (res.success) {
         onSuccess();
       } else {
         alert(`Failed to import from ${label}: ${res.error}`);
       }
     } catch (_err) {
+      console.error(`[UI] Exception in handleImport:`, _err);
       alert("An error occurred during import.");
     } finally {
+      console.log(`[UI] Finished handleImport for ${label}`);
       setLoadingId(null);
     }
   };

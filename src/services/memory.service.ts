@@ -18,11 +18,12 @@ export interface MemorySearchResult {
  * Ensures the target dataset exists in Cognee Cloud and returns its dataset_id.
  */
 async function getOrCreateDataset(datasetName: string): Promise<string> {
-  // Create or get dataset (Cognee POST /api/v1/datasets/ is idempotent)
+  console.log(`[SERVICE] getOrCreateDataset called for: ${datasetName}`);
   const response = await cogneeFetch("/api/v1/datasets/", {
     method: "POST",
     body: JSON.stringify({ name: datasetName }),
   });
+  console.log(`[SERVICE] getOrCreateDataset returned ID: ${response.id}`);
   return response.id;
 }
 
@@ -44,6 +45,8 @@ Content:
 ${input.content}
   `.trim();
 
+  console.log(`[SERVICE] rememberMemory called for title: ${input.title}`);
+
   // 1. Resolve datasetId
   const datasetId = await getOrCreateDataset(datasetName);
 
@@ -61,18 +64,25 @@ ${input.content}
   // As per official specification, datasetId goes into the FormData payload
   formData.append("datasetId", datasetId);
 
+  console.log(`[SERVICE] Sending FormData to /api/v1/add`);
   await cogneeFetch("/api/v1/add", {
     method: "POST",
     body: formData as unknown as BodyInit,
   });
+  console.log(`[SERVICE] /api/v1/add completed`);
 
   // 3. Cognify the dataset
-  return await cogneeFetch("/api/v1/cognify", {
+  console.log(
+    `[SERVICE] Calling /api/v1/cognify for dataset_ids: [${datasetId}]`,
+  );
+  const cognifyRes = await cogneeFetch("/api/v1/cognify", {
     method: "POST",
     body: JSON.stringify({
       dataset_ids: [datasetId],
     }),
   });
+  console.log(`[SERVICE] /api/v1/cognify completed:`, cognifyRes);
+  return cognifyRes;
 }
 
 /**
@@ -82,6 +92,7 @@ export async function searchMemory(
   query: string,
   _datasetName: string = "mnemo",
 ): Promise<MemorySearchResult[]> {
+  console.log(`[SERVICE] searchMemory called with query: "${query}"`);
   const response = await cogneeFetch("/api/v1/search", {
     method: "POST",
     body: JSON.stringify({
@@ -90,6 +101,10 @@ export async function searchMemory(
       datasets: [_datasetName],
     }),
   });
+  console.log(
+    `[SERVICE] searchMemory response:`,
+    JSON.stringify(response).slice(0, 500) + "...",
+  );
 
   const results: MemorySearchResult[] = [];
 
@@ -161,6 +176,7 @@ export async function importMemory(
   mockSourceType: string,
   mockContent: string,
 ): Promise<void> {
+  console.log(`[SERVICE] importMemory called for ${mockSourceType}`);
   await rememberMemory({
     title: `Imported from ${mockSourceType}`,
     content: mockContent,
@@ -168,4 +184,5 @@ export async function importMemory(
     category: "External Import",
     source: mockSourceType,
   });
+  console.log(`[SERVICE] importMemory completed for ${mockSourceType}`);
 }

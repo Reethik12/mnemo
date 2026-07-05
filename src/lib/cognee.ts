@@ -30,6 +30,7 @@ export async function cogneeFetch(endpoint: string, options: RequestInit = {}) {
   const response = await fetch(url, {
     ...options,
     headers,
+    cache: "no-store", // Disable Next.js caching
   });
 
   if (!response.ok) {

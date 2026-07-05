@@ -13,13 +13,15 @@ export async function createMemoryAction(
   input: MemoryInput,
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    console.log(`[ACTION] createMemoryAction called with:`, input);
     if (!input.title || !input.content) {
       throw new Error("Title and content are required.");
     }
     await rememberMemory(input);
+    console.log(`[ACTION] createMemoryAction completed successfully.`);
     return { success: true };
   } catch (error) {
-    console.error("Failed to create memory:", error);
+    console.error("[ACTION] Failed to create memory:", error);
     return {
       success: false,
       error:
@@ -55,10 +57,15 @@ export async function importMockAction(
   content: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    console.log(`[ACTION] importMockAction called for ${sourceType}`);
     await importMemory(sourceType, content);
+    console.log(`[ACTION] importMockAction completed successfully.`);
     return { success: true };
   } catch (error) {
-    console.error(`Failed to import mock memory from ${sourceType}:`, error);
+    console.error(
+      `[ACTION] Failed to import mock memory from ${sourceType}:`,
+      error,
+    );
     return {
       success: false,
       error:
