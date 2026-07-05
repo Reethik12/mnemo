@@ -5,6 +5,7 @@ import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { Sidebar } from "./sidebar";
 import { TopNav } from "./top-nav";
 import { CommandCenter, OfflineBanner } from "@/components";
+import { MnemoAIFab } from "@/components/global/MnemoAIFab";
 
 // ─── Types ───────────────────────────────────────────
 
@@ -47,6 +48,7 @@ export function WorkspaceShell({ children, title }: WorkspaceShellProps) {
 
       <CommandCenter />
       <OfflineBanner />
+      <MnemoAIFab />
     </div>
   );
 }
