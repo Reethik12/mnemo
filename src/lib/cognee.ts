@@ -11,9 +11,13 @@ export async function cogneeFetch(endpoint: string, options: RequestInit = {}) {
   }`;
 
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
     ...(options.headers as Record<string, string>),
   };
+
+  // Only set application/json if body is string (JSON) and no Content-Type is provided
+  if (typeof options.body === "string" && !headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (env.COGNEE_API_KEY) {
     headers["X-API-Key"] = env.COGNEE_API_KEY;

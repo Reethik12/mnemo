@@ -15,8 +15,20 @@ export interface MemorySearchResult {
 }
 
 /**
+ * Ensures the target dataset exists in Cognee Cloud and returns its dataset_id.
+ */
+async function getOrCreateDataset(datasetName: string): Promise<string> {
+  // Create or get dataset (Cognee POST /api/v1/datasets/ is idempotent)
+  const response = await cogneeFetch("/api/v1/datasets/", {
+    method: "POST",
+    body: JSON.stringify({ name: datasetName }),
+  });
+  return response.id;
+}
+
+/**
  * Persist a new memory to Cognee Cloud.
- * Uses the official REST API `/api/v1/add` followed by `/api/v1/cognify`.
+ * Uses the official REST API `/api/v1/add` (FormData) followed by `/api/v1/cognify`.
  */
 export async function rememberMemory(
   input: MemoryInput,
@@ -32,20 +44,33 @@ Content:
 ${input.content}
   `.trim();
 
-  // 1. Add data to dataset
+  // 1. Resolve datasetId
+  const datasetId = await getOrCreateDataset(datasetName);
+
+  // 2. Add data to dataset via FormData (UploadFile)
+  const formData = new FormData();
+
+  // We use a Blob to simulate a text file upload
+  const blob = new Blob([formattedText], { type: "text/plain" });
+  formData.append(
+    "data",
+    blob,
+    `${input.title.replace(/[^a-z0-9]/gi, "_").toLowerCase() || "memory"}.txt`,
+  );
+
+  // As per official specification, datasetId goes into the FormData payload
+  formData.append("datasetId", datasetId);
+
   await cogneeFetch("/api/v1/add", {
     method: "POST",
-    body: JSON.stringify({
-      data: [{ type: "text", text: formattedText }],
-      datasetName: datasetName,
-    }),
+    body: formData as unknown as BodyInit,
   });
 
-  // 2. Cognify the dataset
+  // 3. Cognify the dataset
   return await cogneeFetch("/api/v1/cognify", {
     method: "POST",
     body: JSON.stringify({
-      datasetName: datasetName,
+      dataset_ids: [datasetId],
     }),
   });
 }
@@ -60,9 +85,9 @@ export async function searchMemory(
   const response = await cogneeFetch("/api/v1/search", {
     method: "POST",
     body: JSON.stringify({
-      query_text: query,
-      query_type: "SUMMARIES",
-      datasetName: _datasetName,
+      query: query,
+      searchType: "SUMMARIES",
+      datasets: [_datasetName],
     }),
   });
 
@@ -71,7 +96,6 @@ export async function searchMemory(
   if (!response) return results;
 
   // Adapt based on standard Cognee REST responses
-  // Sometimes it returns a direct array, or a wrapper object.
   const data = Array.isArray(response)
     ? response
     : response.results || response.data || [];
@@ -109,7 +133,8 @@ export async function recallAllMemories(
 
     const items = Array.isArray(dataItems) ? dataItems : dataItems.data || [];
 
-    return items.map((item: Record<string, unknown>) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return items.map((item: any) => ({
       id: item.id || Math.random().toString(36).substring(7),
       text: item.name || item.text || JSON.stringify(item),
     }));
