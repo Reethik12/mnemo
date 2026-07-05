@@ -6,8 +6,11 @@ import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 import { MODULE_CARDS } from "@/lib/constants";
 import { useExchange } from "@/hooks/useExchange";
+import { useMyCollections } from "@/hooks/useMyCollections";
 import { SearchBar } from "@/components/dashboard/exchange/SearchBar";
 import { CollectionCard } from "@/components/dashboard/exchange/CollectionCard";
+import { PublishDialog } from "@/components/dashboard/exchange/PublishDialog";
+import { AnimatePresence } from "framer-motion";
 import type { MemoryCollection } from "@/services/exchange/types";
 
 function ExchangeContent() {
@@ -15,9 +18,11 @@ function ExchangeContent() {
   const query = searchParams.get("q");
   const moduleData = MODULE_CARDS.find((m) => m.id === "memory-exchange")!;
   const { data, isLoading } = useExchange();
+  const { collections: myCollections, refetch: refetchMy } = useMyCollections();
   const [searchResults, setSearchResults] = useState<MemoryCollection[] | null>(
     null,
   );
+  const [showPublish, setShowPublish] = useState(false);
 
   useEffect(() => {
     async function performSearch() {
@@ -51,6 +56,28 @@ function ExchangeContent() {
         variants={fadeInUp}
         className="flex flex-col items-center justify-center space-y-6 py-12 text-center"
       >
+        <div className="absolute top-0 right-0 p-8">
+          <button
+            onClick={() => setShowPublish(true)}
+            className="from-accent-blue shadow-accent-blue/20 hover:shadow-accent-blue/40 flex items-center gap-2 rounded-xl bg-gradient-to-r to-blue-500 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:scale-105"
+          >
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
+            </svg>
+            Publish Collection
+          </button>
+        </div>
+
         <div
           className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br ${moduleData.gradient} text-white shadow-lg`}
         >
@@ -101,6 +128,19 @@ function ExchangeContent() {
         </motion.div>
       ) : (
         <>
+          {myCollections && myCollections.length > 0 && (
+            <motion.div variants={fadeInUp} className="space-y-6">
+              <h2 className="text-text-primary flex items-center gap-2 text-2xl font-semibold">
+                My Published Collections
+              </h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {myCollections.map((c) => (
+                  <CollectionCard key={c.id} collection={c} />
+                ))}
+              </div>
+            </motion.div>
+          )}
+
           <motion.div variants={fadeInUp} className="space-y-6">
             <h2 className="text-text-primary flex items-center gap-2 text-2xl font-semibold">
               Trending Packs
@@ -150,6 +190,17 @@ function ExchangeContent() {
           </motion.div>
         </>
       )}
+
+      <AnimatePresence>
+        {showPublish && (
+          <PublishDialog
+            onClose={() => {
+              setShowPublish(false);
+              refetchMy();
+            }}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

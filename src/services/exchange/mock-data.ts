@@ -116,3 +116,19 @@ export const MOCK_CATEGORIES = [
   "Art",
   "Productivity",
 ];
+
+// Global store for Next.js hot-reload persistence
+declare global {
+  var __PUBLISHED_COLLECTIONS__: MemoryCollection[] | undefined;
+}
+
+if (!global.__PUBLISHED_COLLECTIONS__) {
+  global.__PUBLISHED_COLLECTIONS__ = [];
+}
+
+export const getPublishedCollections = () =>
+  global.__PUBLISHED_COLLECTIONS__ || [];
+export const addPublishedCollection = (c: MemoryCollection) => {
+  if (!global.__PUBLISHED_COLLECTIONS__) global.__PUBLISHED_COLLECTIONS__ = [];
+  global.__PUBLISHED_COLLECTIONS__.push(c);
+};
