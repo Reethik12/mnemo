@@ -101,16 +101,27 @@ export async function searchMemory(
     : response.results || response.data || [];
 
   for (const item of data) {
-    results.push({
-      id: item.id || Math.random().toString(36).substring(7),
-      text:
-        typeof item === "string"
-          ? item
-          : item.text || item.payload
-            ? JSON.stringify(item.payload)
-            : JSON.stringify(item),
-      similarityScore: item.score ?? undefined,
-    });
+    if (item && typeof item === "object" && Array.isArray(item.search_result)) {
+      for (const res of item.search_result) {
+        results.push({
+          id: res.id || Math.random().toString(36).substring(7),
+          text: res.text || JSON.stringify(res),
+          similarityScore:
+            res.similarityScore || res.score || res.feedback_weight,
+        });
+      }
+    } else {
+      results.push({
+        id: item.id || Math.random().toString(36).substring(7),
+        text:
+          typeof item === "string"
+            ? item
+            : item.text || item.payload
+              ? JSON.stringify(item.payload)
+              : JSON.stringify(item),
+        similarityScore: item.score ?? undefined,
+      });
+    }
   }
 
   return results;
@@ -124,12 +135,10 @@ export async function recallAllMemories(
   _datasetName: string = "mnemo",
 ): Promise<MemorySearchResult[]> {
   try {
-    const dataItems = await cogneeFetch(
-      `/api/v1/datasets/${_datasetName}/data`,
-      {
-        method: "GET",
-      },
-    );
+    const datasetId = await getOrCreateDataset(_datasetName);
+    const dataItems = await cogneeFetch(`/api/v1/datasets/${datasetId}/data`, {
+      method: "GET",
+    });
 
     const items = Array.isArray(dataItems) ? dataItems : dataItems.data || [];
 
