@@ -40,7 +40,7 @@ export const MOCK_SPACES: MemorySpace[] = [
   },
 ];
 
-export const MOCK_ACCESS_REQUESTS: AccessRequest[] = [
+export let MOCK_ACCESS_REQUESTS: AccessRequest[] = [
   {
     id: "req-1",
     spaceId: "space-ai-research",
@@ -93,3 +93,37 @@ export const MOCK_MEMBERS: Record<string, SpaceMember[]> = {
     },
   ],
 };
+
+export function removeAccessRequest(id: string) {
+  MOCK_ACCESS_REQUESTS = MOCK_ACCESS_REQUESTS.filter((r) => r.id !== id);
+}
+
+export function addAccessRequest(req: AccessRequest) {
+  MOCK_ACCESS_REQUESTS = [req, ...MOCK_ACCESS_REQUESTS];
+}
+
+export function addSpaceMember(spaceId: string, member: SpaceMember) {
+  if (!MOCK_MEMBERS[spaceId]) {
+    MOCK_MEMBERS[spaceId] = [];
+  }
+  MOCK_MEMBERS[spaceId].push(member);
+}
+
+export function removeSpaceMember(spaceId: string, userId: string) {
+  if (MOCK_MEMBERS[spaceId]) {
+    MOCK_MEMBERS[spaceId] = MOCK_MEMBERS[spaceId].filter(
+      (m) => m.userId !== userId,
+    );
+  }
+}
+
+export function changeSpaceMemberRole(
+  spaceId: string,
+  userId: string,
+  role: string,
+) {
+  if (MOCK_MEMBERS[spaceId]) {
+    const member = MOCK_MEMBERS[spaceId].find((m) => m.userId === userId);
+    if (member) member.role = role as SpaceMember["role"];
+  }
+}

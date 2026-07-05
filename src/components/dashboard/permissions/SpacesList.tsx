@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { fadeInUp } from "@/lib/animations";
 import type { MemorySpace } from "@/services/permissions/types";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 export function SpacesList({
   spaces,
@@ -13,9 +15,15 @@ export function SpacesList({
   isLoading: boolean;
 }) {
   const { generateShareLink } = usePermissions();
+  const { success } = useToast();
+  const router = useRouter();
 
   const handleShare = async (space: MemorySpace) => {
-    await generateShareLink(space.id, "viewer");
+    const link = await generateShareLink(space.id, "viewer");
+    if (link) {
+      await navigator.clipboard.writeText(link.url);
+      success("✓ Link copied to clipboard");
+    }
   };
 
   if (isLoading) {
@@ -97,6 +105,14 @@ export function SpacesList({
               >
                 Share Space
               </button>
+              {space.visibility !== "private" && (
+                <button
+                  onClick={() => router.push(`/dashboard/messages/${space.id}`)}
+                  className="bg-accent-purple/20 text-accent-purple-light hover:bg-accent-purple/40 flex-1 rounded-xl py-2 text-sm font-medium transition-colors"
+                >
+                  Conversation
+                </button>
+              )}
             </div>
           </div>
         </div>

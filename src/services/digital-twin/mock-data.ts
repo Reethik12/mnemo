@@ -24,7 +24,7 @@ export const MOCK_SECURITY_METRICS: SecurityMetrics = {
   pendingRequests: 2,
 };
 
-export const MOCK_AUDIT_LOGS: AuditLogEntry[] = [
+export let MOCK_AUDIT_LOGS: AuditLogEntry[] = [
   {
     id: "log-1",
     action: "grant",
@@ -58,3 +58,20 @@ export const MOCK_AUDIT_LOGS: AuditLogEntry[] = [
     details: "Imported from Github Repository",
   },
 ];
+
+export function addAuditLog(
+  action: string,
+  entity: string,
+  actor: string,
+  details: string,
+) {
+  const newLog: AuditLogEntry = {
+    id: `log-${Date.now()}`,
+    action: action as AuditLogEntry["action"],
+    entity,
+    actor,
+    details,
+    timestamp: new Date().toISOString(),
+  };
+  MOCK_AUDIT_LOGS = [newLog, ...MOCK_AUDIT_LOGS];
+}

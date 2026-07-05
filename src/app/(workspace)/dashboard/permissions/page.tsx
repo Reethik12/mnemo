@@ -8,17 +8,11 @@ import { SpacesList } from "@/components/dashboard/permissions/SpacesList";
 import { AccessRequests } from "@/components/dashboard/permissions/AccessRequests";
 import { OrganizationPanel } from "@/components/dashboard/permissions/OrganizationPanel";
 import { TwinDashboard } from "@/components/dashboard/permissions/TwinDashboard";
-import { TwinChat } from "@/components/dashboard/permissions/TwinChat";
 import { SecurityCenter } from "@/components/dashboard/permissions/SecurityCenter";
 import { usePermissions } from "@/hooks/usePermissions";
 
 type Tab =
-  | "spaces"
-  | "requests"
-  | "organization"
-  | "twin-dashboard"
-  | "twin-chat"
-  | "security";
+  "spaces" | "requests" | "organization" | "twin-dashboard" | "security";
 
 export default function PermissionsTwinPage() {
   const moduleData =
@@ -35,7 +29,6 @@ export default function PermissionsTwinPage() {
     },
     { id: "organization", label: "Workspace" },
     { id: "twin-dashboard", label: "Digital Twin" },
-    { id: "twin-chat", label: "Chat & Simulate" },
     { id: "security", label: "Security & Audit" },
   ];
 
@@ -116,22 +109,6 @@ export default function PermissionsTwinPage() {
         )}
         {activeTab === "organization" && <OrganizationPanel />}
         {activeTab === "twin-dashboard" && <TwinDashboard />}
-        {activeTab === "twin-chat" && (
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <div>
-              <h2 className="mb-4 text-xl font-bold text-white">
-                Your Digital Twin
-              </h2>
-              <TwinChat isTeam={false} />
-            </div>
-            <div>
-              <h2 className="mb-4 text-xl font-bold text-white">
-                Team Twin Simulator
-              </h2>
-              <TwinChat isTeam={true} />
-            </div>
-          </div>
-        )}
         {activeTab === "security" && <SecurityCenter />}
       </motion.div>
     </motion.div>
