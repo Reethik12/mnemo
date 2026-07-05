@@ -18,6 +18,11 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
   EMAIL_FROM: z.string().email().optional(),
+
+  // Cognee Cloud
+  COGNEE_API_URL: z.string().url().default("http://127.0.0.1:8000"),
+  COGNEE_API_KEY: z.string().optional(),
+  COGNEE_TENANT_ID: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);

@@ -1,4 +1,4 @@
-import { getCognee } from "@/lib/cognee";
+import { cogneeFetch } from "@/lib/cognee";
 
 export interface MemoryInput {
   title: string;
@@ -16,16 +16,12 @@ export interface MemorySearchResult {
 
 /**
  * Persist a new memory to Cognee Cloud.
- * Uses the official `remember()` which handles add, cognify, and memify natively.
+ * Uses the official REST API `/api/v1/add` followed by `/api/v1/cognify`.
  */
 export async function rememberMemory(
   input: MemoryInput,
   datasetName: string = "mnemo_fabric",
 ) {
-  const cognee = await getCognee();
-
-  // Format the input into a clean string so Cognee's LLM pipeline can accurately
-  // extract nodes and relationships (since it accepts text/file/url).
   const formattedText = `
 Title: ${input.title}
 Category: ${input.category}
@@ -36,56 +32,59 @@ Content:
 ${input.content}
   `.trim();
 
-  // `remember()` is the high-level API in Cognee for ingestion + graph generation
-  return await cognee.remember(
-    {
-      type: "text",
-      text: formattedText,
-    },
-    datasetName,
-  );
+  // 1. Add data to dataset
+  await cogneeFetch("/api/v1/add", {
+    method: "POST",
+    body: JSON.stringify({
+      data: [{ type: "text", text: formattedText }],
+      dataset_name: datasetName,
+    }),
+  });
+
+  // 2. Cognify the dataset
+  return await cogneeFetch("/api/v1/cognify", {
+    method: "POST",
+    body: JSON.stringify({
+      datasets: [datasetName],
+    }),
+  });
 }
 
 /**
- * Retrieve memories from Cognee Cloud using a semantic query.
+ * Retrieve memories from Cognee Cloud using semantic search REST API.
  */
 export async function searchMemory(
   query: string,
   _datasetName: string = "mnemo_fabric",
 ): Promise<MemorySearchResult[]> {
-  const cognee = await getCognee();
-
-  // `search()` uses semantic/graph search on the given query.
-  // Using SUMMARIES search type to find high-level graph summaries or chunks.
-  const response = await cognee.search(query, {
-    searchType: "SUMMARIES",
+  const response = await cogneeFetch("/api/v1/search", {
+    method: "POST",
+    body: JSON.stringify({
+      query_text: query,
+      query_type: "SUMMARIES",
+    }),
   });
 
   const results: MemorySearchResult[] = [];
 
-  // Parse the search response safely.
-  const result = response.result;
-  if (!result) return results;
+  if (!response) return results;
 
-  if (result.kind === "Items") {
-    for (const item of result.data) {
-      results.push({
-        id: item.id || Math.random().toString(36).substring(7),
-        text: JSON.stringify(item.payload),
-        similarityScore: item.score ?? undefined,
-      });
-    }
-  } else if (result.kind === "Texts") {
-    for (const msg of result.data) {
-      results.push({
-        id: Math.random().toString(36).substring(7),
-        text: msg,
-      });
-    }
-  } else if (result.kind === "Text") {
+  // Adapt based on standard Cognee REST responses
+  // Sometimes it returns a direct array, or a wrapper object.
+  const data = Array.isArray(response)
+    ? response
+    : response.results || response.data || [];
+
+  for (const item of data) {
     results.push({
-      id: Math.random().toString(36).substring(7),
-      text: result.data,
+      id: item.id || Math.random().toString(36).substring(7),
+      text:
+        typeof item === "string"
+          ? item
+          : item.text || item.payload
+            ? JSON.stringify(item.payload)
+            : JSON.stringify(item),
+      similarityScore: item.score ?? undefined,
     });
   }
 
@@ -94,24 +93,27 @@ export async function searchMemory(
 
 /**
  * Retrieve a broad set of recent memories from Cognee.
- * Since the SDK doesn't have a direct "list all graph nodes" function explicitly,
- * we use `datasets.listData` to show raw ingested texts if graph search isn't requested,
- * OR we can just run an empty semantic search.
+ * Uses `/api/v1/datasets/{datasetName}/data` endpoint.
  */
 export async function recallAllMemories(
   _datasetName: string = "mnemo_fabric",
 ): Promise<MemorySearchResult[]> {
-  const cognee = await getCognee();
-
-  // For a complete list of ingested raw data items:
   try {
-    const dataItems = await cognee.datasets.listData(_datasetName);
-    return dataItems.map((item) => ({
-      id: item.id,
-      text: item.name || "Untitled Item",
+    const dataItems = await cogneeFetch(
+      `/api/v1/datasets/${_datasetName}/data`,
+      {
+        method: "GET",
+      },
+    );
+
+    const items = Array.isArray(dataItems) ? dataItems : dataItems.data || [];
+
+    return items.map((item: Record<string, unknown>) => ({
+      id: item.id || Math.random().toString(36).substring(7),
+      text: item.name || item.text || JSON.stringify(item),
     }));
   } catch (err) {
-    console.error("Failed to list dataset data in Cognee:", err);
+    console.error("Failed to list dataset data in Cognee via HTTP:", err);
     return [];
   }
 }

@@ -1,25 +1,42 @@
-import { Cognee } from "@cognee/cognee-ts";
+import { env } from "@/lib/config";
 
 /**
- * Singleton instance of the Cognee SDK.
- * We must ensure `warm()` is called exactly once to avoid performance overhead
- * and to reuse the same engines across all modules.
+ * Helper client to communicate directly with Cognee Cloud HTTP API.
+ * This completely removes the dependency on native Rust binaries (@cognee/cognee-ts)
+ * avoiding Vercel GLIBC compatibility issues.
  */
-let cogneeInstance: Cognee | null = null;
-let warmPromise: Promise<void> | null = null;
+export async function cogneeFetch(endpoint: string, options: RequestInit = {}) {
+  const url = `${env.COGNEE_API_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
 
-export async function getCognee(): Promise<Cognee> {
-  if (!cogneeInstance) {
-    // Cognee automatically picks up configuration from environment variables
-    // (e.g., OPENAI_API_KEY, COGNEE_VECTOR_DB_URL, etc.)
-    cogneeInstance = new Cognee();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options.headers as Record<string, string>),
+  };
+
+  if (env.COGNEE_API_KEY) {
+    headers["X-API-Key"] = env.COGNEE_API_KEY;
+  }
+  if (env.COGNEE_TENANT_ID) {
+    headers["X-Tenant-ID"] = env.COGNEE_TENANT_ID;
   }
 
-  if (!warmPromise) {
-    warmPromise = cogneeInstance.warm();
+  const response = await fetch(url, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    let errorMsg = `Cognee API Error: ${response.status} ${response.statusText}`;
+    try {
+      const errorData = await response.json();
+      if (errorData && errorData.detail) {
+        errorMsg += ` - ${JSON.stringify(errorData.detail)}`;
+      }
+    } catch {
+      // Ignored
+    }
+    throw new Error(errorMsg);
   }
 
-  await warmPromise;
-
-  return cogneeInstance;
+  return response.json();
 }
