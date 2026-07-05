@@ -7,6 +7,8 @@ import {
 } from "@/services/permissions/mock-data";
 import { addAuditLog } from "@/services/digital-twin/mock-data";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const members = await permissionsService.getSpaceMembers("space-work");

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { permissionsService } from "@/services/permissions/permissions.service";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const spaces = await permissionsService.getSpaces();

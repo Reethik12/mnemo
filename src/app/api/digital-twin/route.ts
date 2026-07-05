@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { digitalTwinService } from "@/services/digital-twin/digital-twin.service";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const stats = await digitalTwinService.getStats();

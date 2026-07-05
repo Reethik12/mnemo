@@ -1,4 +1,5 @@
 import { getCollectionDetails } from "./collection.service";
+import { getShareUrl } from "@/lib/url";
 
 export async function shareCollection(
   collectionId: string,
@@ -9,8 +10,7 @@ export async function shareCollection(
     throw new Error("Collection not found");
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://mnemo.app";
-  const link = `${baseUrl}/exchange/c/${collectionId}`;
+  const link = getShareUrl(`exchange/c/${collectionId}`);
 
   return {
     success: true,

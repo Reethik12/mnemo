@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { fadeInUp } from "@/lib/animations";
 import { useToast } from "@/hooks/use-toast";
+import { getShareUrl } from "@/lib/url";
 
 type Member = {
   id: string;
@@ -67,9 +68,7 @@ export function OrganizationPanel() {
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(
-      "https://mnemo.app/invite/workspace-join-xyz",
-    );
+    navigator.clipboard.writeText(getShareUrl("invite/workspace-join-xyz"));
     success("✓ Invite link copied to clipboard");
   };
 

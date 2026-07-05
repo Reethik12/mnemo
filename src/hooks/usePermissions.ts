@@ -44,18 +44,30 @@ export function usePermissions() {
     requestId: string,
     action: "approve" | "reject",
   ) => {
+    // Optimistic update
+    setRequests((prev) => prev.filter((r) => r.id !== requestId));
     try {
       const res = await fetch("/api/permissions/requests/respond", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ requestId, action }),
       });
       if (res.ok) {
         success(`Request ${action}d successfully`);
-        await fetchPermissions();
+        // Refresh spaces and metrics after approval
+        if (action === "approve") {
+          await fetchPermissions();
+        }
         return true;
+      } else {
+        // Revert on failure
+        error(`Failed to ${action} request`);
+        await fetchPermissions();
       }
     } catch {
+      // Revert on failure
       error(`Failed to ${action} request`);
+      await fetchPermissions();
     }
     return false;
   };

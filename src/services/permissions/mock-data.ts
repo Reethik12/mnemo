@@ -98,6 +98,16 @@ export function removeAccessRequest(id: string) {
   MOCK_ACCESS_REQUESTS = MOCK_ACCESS_REQUESTS.filter((r) => r.id !== id);
 }
 
+export function updateAccessRequestStatus(
+  id: string,
+  status: "approved" | "rejected",
+) {
+  const req = MOCK_ACCESS_REQUESTS.find((r) => r.id === id);
+  if (req) {
+    req.status = status;
+  }
+}
+
 export function addAccessRequest(req: AccessRequest) {
   MOCK_ACCESS_REQUESTS = [req, ...MOCK_ACCESS_REQUESTS];
 }

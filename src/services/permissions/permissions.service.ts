@@ -2,11 +2,12 @@ import {
   MOCK_SPACES,
   MOCK_ACCESS_REQUESTS,
   MOCK_MEMBERS,
-  removeAccessRequest,
   addSpaceMember,
   addAccessRequest,
+  updateAccessRequestStatus,
 } from "./mock-data";
 import { addAuditLog } from "../digital-twin/mock-data";
+import { getShareUrl } from "@/lib/url";
 import type {
   MemorySpace,
   AccessRequest,
@@ -50,7 +51,7 @@ export class PermissionsService {
   async approveRequest(requestId: string): Promise<boolean> {
     const req = MOCK_ACCESS_REQUESTS.find((r) => r.id === requestId);
     if (req) {
-      removeAccessRequest(requestId);
+      updateAccessRequestStatus(requestId, "approved");
       addSpaceMember(req.spaceId, {
         id: `mem-${Date.now()}`,
         userId: req.userId,
@@ -73,7 +74,7 @@ export class PermissionsService {
   async rejectRequest(requestId: string): Promise<boolean> {
     const req = MOCK_ACCESS_REQUESTS.find((r) => r.id === requestId);
     if (req) {
-      removeAccessRequest(requestId);
+      updateAccessRequestStatus(requestId, "rejected");
       addAuditLog(
         "remove",
         `Memory Space: ${req.spaceName}`,
@@ -99,7 +100,7 @@ export class PermissionsService {
     return {
       id: `link-${Date.now()}`,
       spaceId,
-      url: `http://localhost:3000/share/${Math.random().toString(36).substring(7)}`,
+      url: getShareUrl(`share/${Math.random().toString(36).substring(7)}`),
       accessLevel: level,
       active: true,
     };

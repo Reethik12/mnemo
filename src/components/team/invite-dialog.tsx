@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getShareUrl } from "@/lib/url";
 
 interface InviteDialogProps {
   workspaceId: string;
@@ -73,7 +74,7 @@ export function InviteDialog({
               <input
                 type="text"
                 readOnly
-                value={`${window.location.origin}/welcome?invite=${inviteToken}`}
+                value={getShareUrl(`welcome?invite=${inviteToken}`)}
                 className="text-text-primary w-full bg-transparent text-xs focus:outline-none"
               />
               <Button
@@ -81,7 +82,7 @@ export function InviteDialog({
                 size="sm"
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    `${window.location.origin}/welcome?invite=${inviteToken}`,
+                    getShareUrl(`welcome?invite=${inviteToken}`),
                   );
                 }}
               >
