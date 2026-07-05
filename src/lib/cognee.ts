@@ -6,7 +6,9 @@ import { env } from "@/lib/config";
  * avoiding Vercel GLIBC compatibility issues.
  */
 export async function cogneeFetch(endpoint: string, options: RequestInit = {}) {
-  const url = `${env.COGNEE_API_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+  const url = `${env.COGNEE_API_URL}${
+    endpoint.startsWith("/") ? endpoint : `/${endpoint}`
+  }`;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -16,6 +18,7 @@ export async function cogneeFetch(endpoint: string, options: RequestInit = {}) {
   if (env.COGNEE_API_KEY) {
     headers["X-API-Key"] = env.COGNEE_API_KEY;
   }
+
   if (env.COGNEE_TENANT_ID) {
     headers["X-Tenant-ID"] = env.COGNEE_TENANT_ID;
   }
@@ -26,17 +29,38 @@ export async function cogneeFetch(endpoint: string, options: RequestInit = {}) {
   });
 
   if (!response.ok) {
-    let errorMsg = `Cognee API Error: ${response.status} ${response.statusText}`;
+    let body = "";
+
     try {
-      const errorData = await response.json();
-      if (errorData && errorData.detail) {
-        errorMsg += ` - ${JSON.stringify(errorData.detail)}`;
-      }
+      body = await response.text();
     } catch {
-      // Ignored
+      body = "<Unable to read response body>";
     }
-    throw new Error(errorMsg);
+
+    console.error("========== COGNEE ERROR ==========");
+    console.error("URL:", url);
+    console.error("METHOD:", options.method ?? "GET");
+    console.error("STATUS:", response.status);
+    console.error("STATUS TEXT:", response.statusText);
+    console.error("REQUEST BODY:", options.body ?? "<empty>");
+    console.error("RESPONSE BODY:", body);
+    console.error("==================================");
+
+    throw new Error(
+      `Cognee API Error: ${response.status} ${response.statusText}\n${body}`,
+    );
   }
 
-  return response.json();
+  // Handle empty responses (204 No Content)
+  if (response.status === 204) {
+    return null;
+  }
+
+  const contentType = response.headers.get("content-type");
+
+  if (contentType?.includes("application/json")) {
+    return response.json();
+  }
+
+  return response.text();
 }
