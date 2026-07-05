@@ -1,6 +1,5 @@
 # --- Build Stage ---
-FROM node:20-alpine AS builder
-RUN apk add --no-bin-cache libc6-compat
+FROM node:20-bookworm-slim AS builder
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml* ./
@@ -11,7 +10,7 @@ RUN npx prisma generate
 RUN pnpm build
 
 # --- Production Runner Stage ---
-FROM node:20-alpine AS runner
+FROM node:20-bookworm-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
